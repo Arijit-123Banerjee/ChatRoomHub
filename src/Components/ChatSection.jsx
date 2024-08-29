@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
-import { IoArrowBack } from "react-icons/io5"; // Import Back Arrow Icon
+import { IoArrowBack } from "react-icons/io5";
 
 const ChatSection = ({ roomName, onExit, onBack }) => {
-  // Add onBack prop
   const [messages, setMessages] = useState([
     { id: 1, sender: "Alice", text: "Hello everyone!" },
     { id: 2, sender: "Bob", text: "Hi Alice, how are you?" },
@@ -27,7 +26,7 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 p-4 sm:p-6 shadow-2xl border-l border-gray-800">
+    <div className="flex flex-col h-screen w-full bg-gray-900 text-gray-100 p-4 sm:p-6 shadow-2xl border-l border-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
         <div className="flex items-center space-x-4">
