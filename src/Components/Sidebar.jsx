@@ -4,6 +4,10 @@ import CreateRoomModal from "./CreateRoomModal"; // Adjust the import path as ne
 const initialRooms = [
   { name: "Room 1", members: 5, status: "Public" },
   { name: "Room 2", members: 3, status: "Private" },
+  { name: "Room 3", members: 4, status: "Public" },
+  { name: "Room 4", members: 2, status: "Private" },
+  { name: "Room 5", members: 6, status: "Public" },
+  { name: "Room 6", members: 1, status: "Private" },
   // Add more rooms here
 ];
 
@@ -24,11 +28,11 @@ const Sidebar = ({ onRoomSelect }) => {
 
   return (
     <>
-      {/* Full Screen Sidebar on Tablet and Mobile */}
+      {/* Full Screen Sidebar on Mobile */}
       <div
-        className={`fixed inset-0 z-40 bg-gradient-to-r from-teal-50 to-blue-50 text-gray-800 p-4 sm:p-6 shadow-xl border-r border-gray-300 transform transition-transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 md:w-80 md:h-screen md:border-l md:border-gray-300`}
+        className={`fixed inset-0 z-50 bg-gradient-to-r from-teal-50 to-blue-50 text-gray-800 p-4 sm:p-6 shadow-xl border-r border-gray-300 transform transition-transform ${
+          sidebarOpen ? "translate-x-0 " : "-translate-x-full"
+        } md:relative md:translate-x-0 md:w-80 md:h-screen md:border-l md:border-gray-300 flex flex-col`}
       >
         {/* Toggle Button for Mobile */}
         <button
@@ -76,40 +80,44 @@ const Sidebar = ({ onRoomSelect }) => {
         </button>
         <p className="text-gray-600 mb-6 font-medium">Available Rooms</p>
 
-        {/* Room List */}
-        <div className="space-y-4">
-          {filteredRooms.length > 0 ? (
-            filteredRooms.map((room, index) => (
-              <div
-                key={index}
-                className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:bg-gray-100 transition duration-300 cursor-pointer"
-                onClick={() => {
-                  onRoomSelect(room); // Notify parent about room selection
-                  if (window.innerWidth <= 768) {
-                    setSidebarOpen(false); // Hide sidebar on mobile
-                  }
-                }}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <div className="text-lg font-semibold text-gray-800">
-                    {room.name}
+        {/* Scrollable Room List */}
+        <div className="flex-1 overflow-y-auto">
+          {" "}
+          {/* Makes this container scrollable */}
+          <div className="space-y-4">
+            {filteredRooms.length > 0 ? (
+              filteredRooms.map((room, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:bg-gray-100 transition duration-300 cursor-pointer"
+                  onClick={() => {
+                    onRoomSelect(room); // Notify parent about room selection
+                    if (window.innerWidth <= 768) {
+                      setSidebarOpen(false); // Hide sidebar on mobile
+                    }
+                  }}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="text-lg font-semibold text-gray-800">
+                      {room.name}
+                    </div>
+                    <div
+                      className={`text-xs px-3 py-1 rounded-full ${
+                        room.status === "Public" ? "bg-teal-500" : "bg-red-500"
+                      } text-white`}
+                    >
+                      {room.status}
+                    </div>
                   </div>
-                  <div
-                    className={`text-xs px-3 py-1 rounded-full ${
-                      room.status === "Public" ? "bg-teal-500" : "bg-red-500"
-                    } text-white`}
-                  >
-                    {room.status}
+                  <div className="text-sm text-gray-600">
+                    Members: {room.members}
                   </div>
                 </div>
-                <div className="text-sm text-gray-600">
-                  Members: {room.members}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600">No rooms found</p>
-          )}
+              ))
+            ) : (
+              <p className="text-gray-600">No rooms found</p>
+            )}
+          </div>
         </div>
 
         {/* Modal */}
@@ -119,29 +127,6 @@ const Sidebar = ({ onRoomSelect }) => {
           onCreate={handleCreateRoom}
         />
       </div>
-
-      {/* Button to show sidebar again on mobile */}
-      {!sidebarOpen && (
-        <button
-          className="fixed bottom-4 right-4 p-3 bg-teal-600 text-white rounded-full shadow-lg z-50 md:hidden"
-          onClick={() => setSidebarOpen(true)}
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M5 12l5 5 5-5-5-5-5 5z"
-            />
-          </svg>
-        </button>
-      )}
     </>
   );
 };
