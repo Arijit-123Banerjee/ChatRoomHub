@@ -38,7 +38,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   type="text"
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                 />
               </div>
 
@@ -51,9 +51,9 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                     onClick={() => setStatus("Public")}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Public"
-                        ? "bg-teal-600 text-white border-teal-600"
+                        ? "bg-blue-600 text-white border-teal-600"
                         : "bg-gray-700 text-gray-300 border-gray-600"
-                    } hover:bg-teal-700 hover:border-teal-700`}
+                    } hover:bg-blue-700 hover:border-teal-700`}
                   >
                     <TfiWorld className="mr-2" />
                     Public
@@ -85,7 +85,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                 <button
                   type="button"
                   onClick={handleCreate}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   Create
                 </button>

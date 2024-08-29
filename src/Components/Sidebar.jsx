@@ -3,14 +3,7 @@ import CreateRoomModal from "./CreateRoomModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
 
-const initialRooms = [
-  { name: "Room 1", members: 5, status: "Public" },
-  { name: "Room 2", members: 3, status: "Private" },
-  { name: "Room 3", members: 4, status: "Public" },
-  { name: "Room 4", members: 2, status: "Private" },
-  { name: "Room 5", members: 6, status: "Public" },
-  { name: "Room 6", members: 1, status: "Private" },
-];
+const initialRooms = [];
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");

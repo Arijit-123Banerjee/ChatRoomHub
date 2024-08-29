@@ -48,7 +48,7 @@ const App = () => {
             onBack={handleBackToSidebar} // Pass handleBackToSidebar to ChatSection
           />
         ) : (
-          <div className="flex-1 h-screen flex items-center justify-center text-gray-300 bg-black">
+          <div className="flex-1 h-screen flex items-center justify-center text-gray-300 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
             No room selected
           </div>
         )}

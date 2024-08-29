@@ -4,7 +4,13 @@ import { Link } from "react-router-dom";
 
 const LandingPage = () => {
   return (
-    <section className="pt-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen flex flex-col justify-center">
+    <section
+      className="pt-12 bg-gradient-to-br from-gray-900 to-gray-800 bg-cover bg-center min-h-screen flex flex-col justify-center"
+      style={{
+        backgroundImage:
+          "url('https://img.freepik.com/free-vector/luxury-circles-background_78370-3185.jpg?t=st=1724945834~exp=1724949434~hmac=cd8266f55443755cae697d70dd5181e92b264e4d96bc5a821d0fef837ef746b2&w=1060')",
+      }}
+    >
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-lg text-gray-400 font-inter mb-4">
@@ -20,21 +26,21 @@ const LandingPage = () => {
 
           <div className="flex flex-col sm:flex-row sm:space-x-4 sm:justify-center mb-12">
             <Link
-              to="#features"
+              to="/app"
               className="inline-flex items-center justify-center px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-cyan-700 to-blue-800 rounded-xl transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-100"
             >
-              Explore Features
+              Go to Dashboard
             </Link>
             <Link
               to="#demo"
-              className="inline-flex items-center justify-center px-8 py-3 mt-4 sm:mt-0 text-lg font-bold text-gray-900 border-2 border-transparent rounded-xl transition-transform transform hover:bg-gradient-to-r hover:from-cyan-700 hover:to-blue-800 hover:text-white hover:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-100"
+              className="inline-flex items-center justify-center px-8 py-3 mt-4 sm:mt-0 text-lg font-bold text-gray-500 border-2 border-transparent rounded-xl transition-transform transform hover:bg-gradient-to-r hover:from-cyan-700 hover:to-blue-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-100"
             >
-              Watch Free Demo
+              Sign Up Free
             </Link>
           </div>
 
-          <p className="text-base text-gray-500 font-inter mb-8">
-            Start your journey today · No credit card required
+          <p className="text-base text-gray-400 font-inter mb-8">
+            Get started with effortless communication
           </p>
 
           <img
