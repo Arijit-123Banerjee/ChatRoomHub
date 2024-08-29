@@ -6,6 +6,7 @@ import { TfiWorld } from "react-icons/tfi";
 const initialRooms = [];
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
+  // State to manage search input, room list, and modal visibility
   const [searchTerm, setSearchTerm] = useState("");
   const [rooms, setRooms] = useState(initialRooms);
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,25 +22,22 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 p-4 sm:p-6 shadow-2xl border-r border-gray-800 transform transition-transform ${
+      className={`fixed inset-0 z-50 bg-gradient-to-br from-[#000e2d] via-[#000e2d] to-[#000e2d] text-gray-100 p-4 sm:p-6 shadow-2xl border-r border-[#000e2d] transform transition-transform ${
         setSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } md:relative md:translate-x-0 md:w-[30%] md:h-screen md:border-l md:border-gray-800 flex flex-col`}
+      } md:relative md:translate-x-0 md:w-[30%] md:h-screen md:border-l md:border-[#000e2d] flex flex-col`}
     >
-      {/* Heading */}
       <div className="text-3xl font-semibold mb-6 text-gray-100 tracking-wide">
         Rooms
       </div>
 
-      {/* Search Input */}
       <input
         type="text"
         placeholder="Search rooms..."
-        className="w-full px-4 py-2 border border-gray-700 bg-gray-900 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200 placeholder-gray-500 mb-6"
+        className="w-full px-4 py-2 border border-[#002244] bg-[#00112d] rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200 placeholder-gray-500 mb-6"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* Create Button */}
       <button
         className="bg-gradient-to-r from-cyan-700 to-blue-800 text-white px-4 py-2 rounded-lg mb-6 shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
         onClick={() => setModalOpen(true)}
@@ -47,7 +45,6 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         Create Room
       </button>
 
-      {/* Room List */}
       <p className="text-gray-400 mb-4 font-medium tracking-wide">
         Available Rooms
       </p>
@@ -57,12 +54,10 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
             filteredRooms.map((room, index) => (
               <div
                 key={index}
-                className="bg-gray-850 p-4 rounded-lg shadow-md border border-gray-700 hover:bg-gray-750 transition duration-300 cursor-pointer"
+                className="bg-[#002244] p-4 rounded-lg shadow-md border border-[#00112d] hover:bg-[#003366] transition duration-300 cursor-pointer"
                 onClick={() => {
-                  onRoomSelect(room); // Notify parent about room selection
-                  if (window.innerWidth <= 768) {
-                    setSidebarOpen(false); // Hide sidebar on mobile
-                  }
+                  onRoomSelect(room);
+                  if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
                 }}
               >
                 <div className="flex justify-between items-center mb-2">
@@ -93,7 +88,6 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         </div>
       </div>
 
-      {/* Create Room Modal */}
       <CreateRoomModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

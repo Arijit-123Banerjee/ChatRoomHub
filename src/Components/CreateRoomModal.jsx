@@ -23,7 +23,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
         onClose={onClose}
       >
         <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-50">
-          <Dialog.Panel className="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
+          <Dialog.Panel className="bg-[#000e2d] rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
             <Dialog.Title className="text-lg font-semibold text-white mb-4">
               Create Room
             </Dialog.Title>

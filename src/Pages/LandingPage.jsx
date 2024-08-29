@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import image from "../assets/landingPageImage.png";
 import { Link } from "react-router-dom";
+import BackgroundImage from "../assets/backgroundimg.jpg";
 
 const LandingPage = () => {
   // Refs for the elements to be animated
@@ -51,10 +52,7 @@ const LandingPage = () => {
   return (
     <section
       className="overflow-hidden pt-12 bg-gradient-to-br from-gray-900 to-gray-800 bg-cover bg-center min-h-screen flex flex-col justify-center"
-      style={{
-        backgroundImage:
-          "url('https://img.freepik.com/free-vector/luxury-circles-background_78370-3185.jpg?t=st=1724945834~exp=1724949434~hmac=cd8266f55443755cae697d70dd5181e92b264e4d96bc5a821d0fef837ef746b2&w=1060')",
-      }}
+      style={{ backgroundImage: `url(${BackgroundImage})` }}
     >
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
         <div className="max-w-3xl mx-auto">

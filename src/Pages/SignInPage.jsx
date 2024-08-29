@@ -24,7 +24,7 @@ const SignIn = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-gray-900 bg-opacity-50 rounded-xl shadow-lg border border-gray-800 max-md:h-screen">
+      <div className="w-full max-w-md p-8 space-y-8 bg-[#000e2d] rounded-xl shadow-lg border border-gray-800 max-md:h-screen">
         {/* Heading */}
         <h2 className="text-3xl font-extrabold text-center text-gray-100">
           Sign In
@@ -87,7 +87,7 @@ const SignIn = () => {
           <div className="absolute inset-0 flex items-center">
             <hr className="w-full border-gray-700" />
           </div>
-          <div className="relative px-3 text-gray-400 bg-gray-900">or</div>
+          <div className="relative px-3 text-gray-400 bg-[#000e2d]">or</div>
         </div>
         <button
           type="button"

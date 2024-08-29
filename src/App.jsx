@@ -3,35 +3,24 @@ import ChatSection from "./Components/ChatSection";
 import Sidebar from "./Components/Sidebar";
 
 const App = () => {
-  const [selectedRoom, setSelectedRoom] = useState(null); // State to manage selected room
-  const [sidebarOpen, setSidebarOpen] = useState(true); // State to manage sidebar visibility
+  // State to manage selected room and sidebar visibility
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleRoomSelect = (room) => {
-    setSelectedRoom(room); // Set the selected room when a room is clicked in the sidebar
-
-    // Hide the sidebar on mobile devices
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false);
-    }
+    setSelectedRoom(room);
+    if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
   };
 
   const handleExitRoom = () => {
-    setSelectedRoom(null); // Clear selected room when exiting the room in chat section
-
-    // Show the sidebar again on mobile when exiting a room
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(true);
-    }
+    setSelectedRoom(null);
+    if (window.innerWidth <= 768) setSidebarOpen(true); // Show sidebar on mobile
   };
 
-  const handleBackToSidebar = () => {
-    // Show the sidebar and hide the chat section on mobile devices
-    setSidebarOpen(true);
-  };
+  const handleBackToSidebar = () => setSidebarOpen(true); // Show sidebar on back action
 
   return (
-    <div className="flex">
-      {/* Sidebar component visibility controlled by `sidebarOpen` state */}
+    <div className="flex h-screen bg-[#000e2d]">
       {sidebarOpen && (
         <Sidebar
           onRoomSelect={handleRoomSelect}
@@ -39,16 +28,19 @@ const App = () => {
         />
       )}
 
-      {/* Conditionally render ChatSection or No Room Selected message */}
-      <div className={`flex-1 ${sidebarOpen ? "hidden md:flex" : "flex"}`}>
+      <div
+        className={`flex-1 ${
+          sidebarOpen ? "hidden md:flex" : "flex"
+        } transition-all duration-300`}
+      >
         {selectedRoom ? (
           <ChatSection
             roomName={selectedRoom.name}
             onExit={handleExitRoom}
-            onBack={handleBackToSidebar} // Pass handleBackToSidebar to ChatSection
+            onBack={handleBackToSidebar}
           />
         ) : (
-          <div className="flex-1 h-screen flex items-center justify-center text-gray-300 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          <div className="flex-1 h-screen flex items-center justify-center text-gray-300 bg-[#000e2d]">
             No room selected
           </div>
         )}
