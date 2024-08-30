@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import ChatSection from "./Components/ChatSection";
 import Sidebar from "./Components/Sidebar";
-import ConfirmationModal from "./Components/ConfirmationModal"; // Import ConfirmationModal
+import ConfirmationModal from "./Components/ConfirmationModal";
 
 const App = () => {
-  // State to manage selected room, sidebar visibility, and modal visibility
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);

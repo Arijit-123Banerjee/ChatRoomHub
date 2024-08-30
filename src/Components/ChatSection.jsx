@@ -2,29 +2,56 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
+import {
+  collection,
+  query,
+  onSnapshot,
+  addDoc,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../../firebase"; // Adjust the path as needed
 
 const ChatSection = ({ roomName, onExit, onBack }) => {
-  const [messages, setMessages] = useState([
-    { id: 1, sender: "Alice", text: "Hello everyone!" },
-    { id: 2, sender: "Bob", text: "Hi Alice, how are you?" },
-    { id: 3, sender: "Alice", text: "I'm good, thanks! What about you?" },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Fetch messages from Firestore
+  useEffect(() => {
+    const messagesRef = collection(db, `rooms/${roomName}/messages`);
+    const q = query(messagesRef, orderBy("timestamp"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const messagesList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(messagesList);
+    });
+
+    return () => unsubscribe();
+  }, [roomName]);
 
   // Scroll to the bottom of the messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
+  // Handle sending messages
+  const handleSendMessage = async () => {
     if (newMessage.trim() !== "") {
-      setMessages([
-        ...messages,
-        { id: messages.length + 1, sender: "You", text: newMessage },
-      ]);
-      setNewMessage(""); // Clear input after sending
+      try {
+        const messagesRef = collection(db, `rooms/${roomName}/messages`);
+        await addDoc(messagesRef, {
+          sender: "You",
+          text: newMessage,
+          timestamp: new Date(),
+        });
+        setNewMessage(""); // Clear input after sending
+      } catch (error) {
+        console.error("Error sending message: ", error);
+      }
     }
   };
 

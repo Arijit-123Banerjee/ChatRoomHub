@@ -51,11 +51,11 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
       await addDoc(collection(db, "rooms"), {
         name: newRoom.name,
         status: newRoom.status,
-        roomKey: newRoom.roomKey,
-        members: newRoom.members || 0,
+        roomKey: newRoom.roomKey, // Store the room key if the room is private
+        members: newRoom.members || 0, // Initialize members count
         memberUIDs: [],
       });
-      setModalOpen(false);
+      setModalOpen(false); // Close the modal after creating the room
     } catch (error) {
       console.error("Error adding room: ", error);
     }
