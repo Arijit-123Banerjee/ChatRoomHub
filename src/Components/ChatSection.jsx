@@ -10,8 +10,10 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../firebase"; // Adjust the path as needed
+import useAuth from "../hooks/useAuth"; // Custom hook to get current user
 
 const ChatSection = ({ roomName, onExit, onBack }) => {
+  const { currentUser } = useAuth(); // Get current user from auth
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -44,7 +46,7 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
       try {
         const messagesRef = collection(db, `rooms/${roomName}/messages`);
         await addDoc(messagesRef, {
-          sender: "You",
+          sender: currentUser.uid, // Save the sender's UID
           text: newMessage,
           timestamp: new Date(),
         });
@@ -108,17 +110,21 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
             <div
               key={message.id}
               className={`flex ${
-                message.sender === "You" ? "justify-end" : "justify-start"
+                message.sender === currentUser.uid
+                  ? "justify-end"
+                  : "justify-start"
               }`}
             >
               <div
                 className={`${
-                  message.sender === "You"
+                  message.sender === currentUser.uid
                     ? "bg-gradient-to-r from-[#003366] to-[#004080] text-white"
                     : "bg-[#002244] text-gray-300"
                 } max-w-xs p-3 rounded-lg shadow-md`}
               >
-                <div className="font-medium">{message.sender}</div>
+                <div className="font-medium">
+                  {message.sender === currentUser.uid ? "You" : "Other User"}
+                </div>
                 <div className="text-sm">{message.text}</div>
               </div>
             </div>
