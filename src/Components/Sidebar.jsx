@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import CreateRoomModal from "./CreateRoomModal";
+import JoinRoomModal from "./JoinRoomModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
 
 const initialRooms = [];
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
-  // State to manage search input, room list, and modal visibility
   const [searchTerm, setSearchTerm] = useState("");
   const [rooms, setRooms] = useState(initialRooms);
   const [modalOpen, setModalOpen] = useState(false);
+  const [joinModalOpen, setJoinModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   const filteredRooms = rooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -18,6 +20,22 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const handleCreateRoom = (newRoom) => {
     setRooms((prevRooms) => [{ ...newRoom, members: 0 }, ...prevRooms]);
     setModalOpen(false);
+  };
+
+  const handleRoomSelect = (room) => {
+    if (room.status === "Private") {
+      setSelectedRoom(room);
+      setJoinModalOpen(true); // Open the join modal for private rooms
+    } else {
+      onRoomSelect(room);
+      if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+    }
+  };
+
+  const handleJoinRoom = () => {
+    if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+    onRoomSelect(selectedRoom);
+    setJoinModalOpen(false);
   };
 
   return (
@@ -55,10 +73,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
               <div
                 key={index}
                 className="bg-[#002244] p-4 rounded-lg shadow-md border border-[#00112d] hover:bg-[#003366] transition duration-300 cursor-pointer"
-                onClick={() => {
-                  onRoomSelect(room);
-                  if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
-                }}
+                onClick={() => handleRoomSelect(room)}
               >
                 <div className="flex justify-between items-center mb-2">
                   <div className="text-lg font-semibold text-gray-200">
@@ -93,6 +108,16 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         onClose={() => setModalOpen(false)}
         onCreate={handleCreateRoom}
       />
+
+      {/* JoinRoomModal for private rooms */}
+      {selectedRoom && (
+        <JoinRoomModal
+          isOpen={joinModalOpen}
+          onClose={() => setJoinModalOpen(false)}
+          onJoin={handleJoinRoom}
+          expectedKey={selectedRoom.roomKey}
+        />
+      )}
     </div>
   );
 };

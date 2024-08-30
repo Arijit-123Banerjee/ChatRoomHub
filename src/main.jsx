@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import LandingPage from "./Pages/LandingPage.jsx";
 import "./index.css";
 import SignInPage from "./Pages/SignInPage.jsx";
+import Login from "./Pages/Login.jsx";
 
 // Configure routes
 const router = createBrowserRouter([
@@ -14,9 +15,16 @@ const router = createBrowserRouter([
   },
   {
     path: "/app",
-    element: <App />, // Add the route for the main app
+    element: <App />,
   },
-  { path: "/signin", element: <SignInPage /> },
+  {
+    path: "/signin",
+    element: <SignInPage />,
+  },
+  {
+    path: "/login", // Add the login page route
+    element: <Login />,
+  },
 ]);
 
 // Render the application
