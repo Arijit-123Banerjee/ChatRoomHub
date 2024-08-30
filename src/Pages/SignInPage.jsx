@@ -6,7 +6,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../Components/LoadingSpinner"; // Import the loading spinner
 
-const SignIn = () => {
+const SignInPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +39,7 @@ const SignIn = () => {
 
       console.log("Sign Up Successful!", response);
       setError("");
-      navigate("/login"); // Redirect to login page
+      navigate("/login"); // Redirect to login page after sign up
     } catch (err) {
       console.log(err);
       setError(err.message);
@@ -157,7 +157,7 @@ const SignIn = () => {
         {/* Sign Up Link */}
         <p className="text-sm text-center text-gray-400 mt-4">
           Don't have an account?{" "}
-          <a href="#" className="text-cyan-500 hover:underline">
+          <a href="/signin" className="text-cyan-500 hover:underline">
             Sign Up
           </a>
         </p>
@@ -166,4 +166,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignInPage;
