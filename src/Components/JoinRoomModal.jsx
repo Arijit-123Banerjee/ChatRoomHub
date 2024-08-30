@@ -40,6 +40,7 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
       setOtp(["", "", "", ""]);
     } else {
       setError("Incorrect key. Please try again.");
+      setOtp(["", "", "", ""]);
     }
   };
 
