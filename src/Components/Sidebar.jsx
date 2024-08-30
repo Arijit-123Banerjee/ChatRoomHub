@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CreateRoomModal from "./CreateRoomModal";
-import JoinRoomModal from "./JoinRoomModal";
+import JoinRoomModal from "./JoinRoomModal"; // Import JoinRoomModal
 import ConfirmationModal from "./ConfirmationModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
@@ -19,10 +19,10 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [rooms, setRooms] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [joinModalOpen, setJoinModalOpen] = useState(false);
+  const [joinModalOpen, setJoinModalOpen] = useState(false); // State for join modal
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [expectedKey, setExpectedKey] = useState("");
+  const [expectedKey, setExpectedKey] = useState(""); // State to hold the expected room key
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -53,7 +53,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         status: newRoom.status,
         roomKey: newRoom.roomKey,
         members: newRoom.members || 0,
-        memberUIDs: [currentUser.uid], // Add creator's UID to room
+        memberUIDs: [],
       });
       setModalOpen(false);
     } catch (error) {
@@ -66,15 +66,14 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
       setSelectedRoom(room);
       setConfirmationModalOpen(true);
     } else {
-      setExpectedKey(room.roomKey);
+      setExpectedKey(room.roomKey); // Set the expected key for private rooms
       setSelectedRoom(room);
-      setJoinModalOpen(true);
+      setJoinModalOpen(true); // Open join modal for private rooms
     }
   };
 
-  const handleConfirmJoinRoom = async () => {
+  const handleConfirmJoinRoom = () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
-    await updateRoom(selectedRoom.id, true);
     onRoomSelect(selectedRoom);
     setConfirmationModalOpen(false);
   };
@@ -83,36 +82,10 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
     setConfirmationModalOpen(false);
   };
 
-  const handleJoin = async () => {
+  const handleJoin = () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
-    await updateRoom(selectedRoom.id, true);
     onRoomSelect(selectedRoom);
     setJoinModalOpen(false);
-  };
-
-  const updateRoom = async (roomId, isJoining) => {
-    const roomRef = doc(db, "rooms", roomId);
-
-    try {
-      await updateDoc(roomRef, (prevData) => {
-        let updatedMembers = prevData.members;
-        let updatedMemberUIDs = [...prevData.memberUIDs];
-
-        if (isJoining) {
-          if (!updatedMemberUIDs.includes(currentUser.uid)) {
-            updatedMembers += 1;
-            updatedMemberUIDs.push(currentUser.uid);
-          }
-        }
-
-        return {
-          members: updatedMembers,
-          memberUIDs: updatedMemberUIDs,
-        };
-      });
-    } catch (error) {
-      console.error("Error updating room: ", error);
-    }
   };
 
   return (
