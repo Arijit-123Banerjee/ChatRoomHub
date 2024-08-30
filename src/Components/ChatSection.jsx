@@ -48,7 +48,7 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
         await addDoc(messagesRef, {
           sender: currentUser.uid, // Save the sender's UID
           text: newMessage,
-          timestamp: new Date(),
+          timestamp: new Date(), // Save the timestamp
         });
         setNewMessage(""); // Clear input after sending
       } catch (error) {
