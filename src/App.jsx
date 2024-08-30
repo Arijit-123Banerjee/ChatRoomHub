@@ -1,14 +1,26 @@
 import React, { useState } from "react";
 import ChatSection from "./Components/ChatSection";
 import Sidebar from "./Components/Sidebar";
+import ConfirmationModal from "./Components/ConfirmationModal"; // Import ConfirmationModal
 
 const App = () => {
-  // State to manage selected room and sidebar visibility
+  // State to manage selected room, sidebar visibility, and modal visibility
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
   const handleRoomSelect = (room) => {
-    setSelectedRoom(room);
+    if (room.status === "Private") {
+      setSelectedRoom(room);
+      setConfirmationModalOpen(true); // Open confirmation modal for private rooms
+    } else {
+      setSelectedRoom(room);
+      if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+    }
+  };
+
+  const handleConfirmJoin = () => {
+    setConfirmationModalOpen(false);
     if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
   };
 
@@ -45,6 +57,12 @@ const App = () => {
           </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={confirmationModalOpen}
+        onClose={() => setConfirmationModalOpen(false)}
+        onConfirm={handleConfirmJoin}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
@@ -11,6 +11,12 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
   ]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  // Scroll to the bottom of the messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== "") {
@@ -27,12 +33,13 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
   return (
     <div className="flex flex-col h-screen w-full bg-[#000e2d] text-gray-100 p-4 sm:p-6 shadow-2xl border-l border-[#000e2d]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b-2  border-[#111f36]">
+      <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-[#111f36]">
         <div className="flex items-center space-x-4">
           {/* Back Arrow Button (Visible on Mobile Only) */}
           <button
             className="md:hidden text-gray-400 hover:text-gray-300 focus:outline-none"
             onClick={onBack} // Call onBack when button is clicked
+            aria-label="Back to Rooms"
           >
             <IoArrowBack className="w-6 h-6" />
           </button>
@@ -48,6 +55,7 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
           <button
             className="text-gray-400 hover:text-gray-300 focus:outline-none"
             onClick={toggleDropdown}
+            aria-label="More Options"
           >
             <BsThreeDotsVertical className="w-6 h-6" />
           </button>
@@ -57,6 +65,7 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
               <button
                 className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-[#00112d]"
                 onClick={onExit}
+                aria-label="Exit Room"
               >
                 Exit Room
               </button>
@@ -87,6 +96,7 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} /> {/* Scroll reference */}
         </div>
       </div>
 
