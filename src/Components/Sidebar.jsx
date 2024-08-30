@@ -1,39 +1,67 @@
-import React, { useState } from "react";
+// Sidebar.js
+import React, { useState, useEffect } from "react";
 import CreateRoomModal from "./CreateRoomModal";
 import JoinRoomModal from "./JoinRoomModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
-
-const initialRooms = [];
+import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [rooms, setRooms] = useState(initialRooms);
+  const [rooms, setRooms] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "rooms"),
+      (snapshot) => {
+        const roomsList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setRooms(roomsList);
+      },
+      (error) => {
+        console.error("Error fetching rooms: ", error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   const filteredRooms = rooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateRoom = (newRoom) => {
-    setRooms((prevRooms) => [{ ...newRoom, members: 0 }, ...prevRooms]);
-    setModalOpen(false);
+  const handleCreateRoom = async (newRoom) => {
+    try {
+      await addDoc(collection(db, "rooms"), {
+        name: newRoom.name,
+        status: newRoom.status,
+        roomKey: newRoom.roomKey,
+        members: newRoom.members || 0,
+      });
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error adding room: ", error);
+    }
   };
 
   const handleRoomSelect = (room) => {
     if (room.status === "Private") {
       setSelectedRoom(room);
-      setJoinModalOpen(true); // Open the join modal for private rooms
+      setJoinModalOpen(true);
     } else {
       onRoomSelect(room);
-      if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+      if (window.innerWidth <= 768) setSidebarOpen(false);
     }
   };
 
   const handleJoinRoom = () => {
-    if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+    if (window.innerWidth <= 768) setSidebarOpen(false);
     onRoomSelect(selectedRoom);
     setJoinModalOpen(false);
   };
@@ -109,7 +137,6 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         onCreate={handleCreateRoom}
       />
 
-      {/* JoinRoomModal for private rooms */}
       {selectedRoom && (
         <JoinRoomModal
           isOpen={joinModalOpen}

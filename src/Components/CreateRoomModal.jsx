@@ -1,7 +1,8 @@
+// CreateRoomModal.js
 import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { TfiWorld } from "react-icons/tfi"; // Icon for "Public"
-import { CiLock } from "react-icons/ci"; // Icon for "Private"
+import { TfiWorld } from "react-icons/tfi";
+import { CiLock } from "react-icons/ci";
 
 const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
   const [roomName, setRoomName] = useState("");
@@ -39,7 +40,6 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
               Create Room
             </Dialog.Title>
             <div className="space-y-4">
-              {/* Room Name Input */}
               <div>
                 <label htmlFor="room-name" className="block text-gray-300">
                   Room Name
@@ -52,8 +52,6 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   className="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                 />
               </div>
-
-              {/* Status Selection Buttons */}
               <div>
                 <label className="block text-gray-300 mb-2">Status</label>
                 <div className="flex space-x-4">
@@ -61,7 +59,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                     type="button"
                     onClick={() => {
                       setStatus("Public");
-                      setRoomKey(""); // Reset room key if Public is selected
+                      setRoomKey("");
                     }}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Public"
@@ -76,7 +74,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                     type="button"
                     onClick={() => {
                       setStatus("Private");
-                      generateRoomKey(); // Generate key when Private is selected
+                      generateRoomKey();
                     }}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Private"
@@ -89,8 +87,6 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   </button>
                 </div>
               </div>
-
-              {/* Display Room Key if Private */}
               {status === "Private" && roomKey && (
                 <div className="bg-gray-800 text-center p-4 rounded-md">
                   <p className="text-gray-300 mb-2">Room Key:</p>
@@ -100,8 +96,6 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   </p>
                 </div>
               )}
-
-              {/* Action Buttons */}
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
