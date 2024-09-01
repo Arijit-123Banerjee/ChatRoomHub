@@ -43,7 +43,7 @@ const SignInPage = () => {
       navigate("/login");
     } catch (error) {
       console.error("Sign-In failed", error);
-      setError("Sign-In failed");
+      setError(error.message); // Provide detailed error message
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +65,7 @@ const SignInPage = () => {
       navigate("/login");
     } catch (error) {
       console.error("Google Sign-In failed", error);
-      setError("Google Sign-In failed");
+      setError(error.message); // Provide detailed error message
     }
   };
 
