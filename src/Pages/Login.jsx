@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaGoogle } from "react-icons/fa";
 import LoadingSpinner from "../Components/LoadingSpinner";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -39,27 +38,17 @@ const Login = () => {
       navigate("/app");
     } catch (error) {
       console.error("Login failed", error);
-      setError("Login failed");
+      setError("Login failed. Please check your email and password.");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithPopup(auth, provider);
-      navigate("/app");
-    } catch (error) {
-      console.error("Google Sign-In failed", error);
-      setError("Google Sign-In failed");
     }
   };
 
   return isLoading ? (
     <LoadingSpinner />
   ) : (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-[#000e2d] rounded-xl shadow-lg border border-gray-800 max-md:h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 text-gray-100">
+      <div className="w-full max-w-md p-8 space-y-8 bg-gray-900 rounded-xl shadow-lg border border-gray-700">
         <h2 className="text-3xl font-extrabold text-center text-gray-100">
           Log In
         </h2>
@@ -79,7 +68,7 @@ const Login = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-100 placeholder-gray-500"
+              className="w-full px-4 py-2 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-100 placeholder-gray-500"
               placeholder="Enter your email"
             />
           </div>
@@ -98,7 +87,7 @@ const Login = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-100 placeholder-gray-500"
+              className="w-full px-4 py-2 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-100 placeholder-gray-500"
               placeholder="Enter your password"
             />
           </div>
@@ -117,16 +106,8 @@ const Login = () => {
           <div className="absolute inset-0 flex items-center">
             <hr className="w-full border-gray-700" />
           </div>
-          <div className="relative px-3 text-gray-400 bg-[#000e2d]">or</div>
+          <div className="relative px-3 text-gray-400 bg-gray-900">or</div>
         </div>
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          className="w-full py-2 mt-4 bg-gray-800 text-gray-200 rounded-lg shadow-lg flex items-center justify-center gap-3 transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
-        >
-          <FaGoogle className="w-5 h-5" />
-          Log In with Google
-        </button>
 
         <p className="text-sm text-center text-gray-400 mt-4">
           Don't have an account?{" "}

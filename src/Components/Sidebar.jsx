@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import CreateRoomModal from "./CreateRoomModal";
 import JoinRoomModal from "./JoinRoomModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
+import { signOut } from "firebase/auth"; // Import signOut function
+import { auth } from "../firebase"; // Import your Firebase auth instance
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,6 +16,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [expectedKey, setExpectedKey] = useState("");
+  const navigate = useNavigate(); // Initialize navigate function
 
   // Example function for adding a room, you can replace this with your own logic
   const handleCreateRoom = (newRoom) => {
@@ -75,6 +79,16 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
     setJoinModalOpen(false);
   };
 
+  // Handle user logout
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out user
+      navigate("/login"); // Redirect to login page
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   return (
     <div
       className={`fixed inset-0 z-50 bg-gradient-to-br from-[#000e2d] via-[#000e2d] to-[#000e2d] text-gray-100 p-4 sm:p-6 shadow-2xl border-r border-[#000e2d] transform transition-transform ${
@@ -98,6 +112,13 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         onClick={() => setModalOpen(true)}
       >
         Create Room
+      </button>
+
+      <button
+        className="bg-red-600 text-white px-4 py-2 rounded-lg mb-6 shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+        onClick={handleLogout}
+      >
+        Logout
       </button>
 
       <p className="text-gray-400 mb-4 font-medium tracking-wide">
