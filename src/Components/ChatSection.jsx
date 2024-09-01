@@ -2,20 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
-import ShowMembersModal from "./ShowMembersModal";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-import { app } from "../firebase";
 
-const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
+const ChatSection = ({ roomName, onExit, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [members, setMembers] = useState([]);
   const messagesEndRef = useRef(null);
 
   // Simulate fetching messages
   useEffect(() => {
+    // Simulated messages
     const simulatedMessages = [
       { id: "1", sender: "user1", text: "Hello!", timestamp: new Date() },
       { id: "2", sender: "user2", text: "Hi there!", timestamp: new Date() },
@@ -23,62 +19,45 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     setMessages(simulatedMessages);
   }, [roomName]);
 
-  // Fetch members data from Firestore
-  const fetchMembers = async () => {
-    try {
-      const db = getFirestore(app);
-      const docRef = doc(db, "rooms", roomId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setMembers(docSnap.data().members || []);
-      } else {
-        console.log("No such document!");
-      }
-    } catch (error) {
-      console.error("Error fetching room data: ", error);
-    }
-  };
-
+  // Scroll to the bottom of the messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Handle sending messages
   const handleSendMessage = () => {
     if (newMessage.trim() !== "") {
       const newMsg = {
-        id: (messages.length + 1).toString(),
-        sender: "currentUser",
+        id: (messages.length + 1).toString(), // Simple ID generation
+        sender: "currentUser", // Placeholder for current user
         text: newMessage,
         timestamp: new Date(),
       };
       setMessages([...messages, newMsg]);
-      setNewMessage("");
+      setNewMessage(""); // Clear input after sending
     }
   };
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-  const handleAvatarClick = () => {
-    fetchMembers();
-    setModalOpen(true);
-  };
-
   return (
     <div className="flex flex-col h-screen w-full bg-[#000e2d] text-gray-100 p-4 sm:p-6 shadow-2xl border-l border-[#000e2d]">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-[#111f36]">
         <div className="flex items-center space-x-4">
+          {/* Back Arrow Button (Visible on Mobile Only) */}
           <button
             className="md:hidden text-gray-400 hover:text-gray-300 focus:outline-none"
-            onClick={onBack}
+            onClick={onBack} // Call onBack when button is clicked
             aria-label="Back to Rooms"
           >
             <IoArrowBack className="w-6 h-6" />
           </button>
+          {/* Room Avatar and Name */}
           <img
-            src="https://via.placeholder.com/40"
+            src="https://via.placeholder.com/40" // Replace with actual room image
             alt="Room Avatar"
-            className="w-10 h-10 rounded-full border-4 border-[#e9ecf2]"
-            onClick={handleAvatarClick}
+            className="w-10 h-10 rounded-full border border-[#00112d]"
           />
           <div className="text-xl font-semibold text-gray-200">{roomName}</div>
         </div>
@@ -90,6 +69,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           >
             <BsThreeDotsVertical className="w-6 h-6" />
           </button>
+          {/* Dropdown Menu */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-32 bg-[#002244] rounded-lg shadow-lg overflow-hidden z-10">
               <button
@@ -104,6 +84,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
         </div>
       </div>
 
+      {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto mb-4">
         <div className="space-y-4">
           {messages.map((message) => (
@@ -129,10 +110,11 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
               </div>
             </div>
           ))}
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} /> {/* Scroll reference */}
         </div>
       </div>
 
+      {/* Input Field */}
       <div className="flex items-center border-t border-[#00112d] pt-4">
         <input
           type="text"
@@ -148,13 +130,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           <FiSend className="w-5 h-5" />
         </button>
       </div>
-
-      <ShowMembersModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        members={members}
-        roomId={roomId}
-      />
     </div>
   );
 };
