@@ -1,36 +1,51 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+// Sidebar.js
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import CreateRoomModal from "./CreateRoomModal";
 import JoinRoomModal from "./JoinRoomModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
-import { signOut } from "firebase/auth"; // Import signOut function
-import { auth } from "../firebase"; // Import your Firebase auth instance
+import { signOut } from "firebase/auth";
+import { auth, database } from "../firebase";
+import { collection, onSnapshot } from "firebase/firestore";
+import { AddUserToRoom } from "./AddUserToRoom";
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [rooms, setRooms] = useState([]); // Initialize with an empty array or pre-loaded data
+  const [rooms, setRooms] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [expectedKey, setExpectedKey] = useState("");
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
 
-  // Example function for adding a room, you can replace this with your own logic
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(database, "rooms"),
+      (snapshot) => {
+        const roomsList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setRooms(roomsList);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
   const handleCreateRoom = (newRoom) => {
-    const newRoomsList = [...rooms, { ...newRoom, members: [] }];
+    const newRoomsList = [...rooms, newRoom];
     setRooms(newRoomsList);
     setModalOpen(false);
   };
 
-  // Function to filter rooms based on the search term
   const filteredRooms = rooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle room selection
   const handleRoomSelect = (room) => {
     if (room.status === "Public") {
       setSelectedRoom(room);
@@ -42,48 +57,29 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
     }
   };
 
-  // Confirm joining a public room
-  const handleConfirmJoinRoom = () => {
+  const handleConfirmJoinRoom = async () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
+    await AddUserToRoom(selectedRoom.id, auth.currentUser); // Add user to room
     onRoomSelect(selectedRoom);
     setConfirmationModalOpen(false);
   };
 
-  // Cancel joining a room
   const handleCancelJoinRoom = () => {
     setConfirmationModalOpen(false);
   };
 
-  // Handle joining a private room
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
 
-    const updatedRooms = rooms.map((room) =>
-      room.id === selectedRoom.id
-        ? {
-            ...room,
-            members: [
-              ...room.members,
-              {
-                uid: "user-uid",
-                email: "user-email",
-                displayName: "user-name",
-              },
-            ],
-          }
-        : room
-    );
-
-    setRooms(updatedRooms);
+    await AddUserToRoom(selectedRoom.id, auth.currentUser); // Add user to room
     onRoomSelect(selectedRoom);
     setJoinModalOpen(false);
   };
 
-  // Handle user logout
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Sign out user
-      navigate("/login"); // Redirect to login page
+      await signOut(auth);
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -127,9 +123,9 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
       <div className="flex-1 overflow-y-auto">
         <div className="space-y-4">
           {filteredRooms.length > 0 ? (
-            filteredRooms.map((room, index) => (
+            filteredRooms.map((room) => (
               <div
-                key={index}
+                key={room.id}
                 className="bg-[#002244] p-4 rounded-lg shadow-md border border-[#00112d] hover:bg-[#003366] transition duration-300 cursor-pointer"
                 onClick={() => handleRoomSelect(room)}
               >
@@ -151,7 +147,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
                   </div>
                 </div>
                 <div className="text-sm text-gray-400">
-                  Members: {room.members?.length || 0}
+                  Members: {room.memberCount || 0}
                 </div>
               </div>
             ))
@@ -165,6 +161,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onCreate={handleCreateRoom}
+        user={auth.currentUser}
       />
 
       {selectedRoom && (

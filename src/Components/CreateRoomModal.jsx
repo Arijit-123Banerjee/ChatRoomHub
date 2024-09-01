@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { TfiWorld } from "react-icons/tfi";
 import { CiLock } from "react-icons/ci";
+import { database as db } from "../firebase"; // Import Firestore
+import { collection, addDoc } from "firebase/firestore";
+import { auth } from "../firebase"; // Import Firebase auth
 
-const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
+const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
   const [roomName, setRoomName] = useState("");
   const [status, setStatus] = useState("Public");
   const [roomKey, setRoomKey] = useState("");
@@ -15,17 +18,36 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
   };
 
   // Handle room creation logic
-  const handleCreate = () => {
-    if (roomName) {
-      onCreate({
-        name: roomName,
-        status,
-        roomKey: status === "Private" ? roomKey : null,
-      });
-      // Reset state after room creation
-      setRoomName("");
-      setStatus("Public");
-      setRoomKey("");
+  const handleCreate = async () => {
+    if (roomName && user) {
+      try {
+        const roomData = {
+          name: roomName,
+          status,
+          roomKey: status === "Private" ? roomKey : null,
+          members: [
+            {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName || "Unknown",
+            },
+          ],
+          memberCount: 1, // Initialize with 1 member (the creator)
+        };
+
+        // Store the room data in Firestore
+        const docRef = await addDoc(collection(db, "rooms"), roomData);
+
+        // Call the onCreate callback with the new room data
+        onCreate({ ...roomData, id: docRef.id });
+
+        // Reset state after room creation
+        setRoomName("");
+        setStatus("Public");
+        setRoomKey("");
+      } catch (error) {
+        console.error("Failed to create room", error);
+      }
     }
   };
 

@@ -27,8 +27,11 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").split("").slice(0, 4);
+    const pastedData = e.clipboardData.getData("text").slice(0, 4).split("");
     setOtp(pastedData);
+    if (pastedData.length > 0) {
+      document.getElementById(`otp-${pastedData.length - 1}`).focus();
+    }
   };
 
   const handleSubmit = (e) => {
@@ -68,7 +71,7 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
                     key={index}
                     id={`otp-${index}`}
                     type="text"
-                    className="w-14 h-14 text-center text-2xl font-extrabold text-white bg-[#00112d] border border-gray-600 hover:border-gray-500 appearance-none rounded p-4 outline-none focus:bg-[#000e2d] focus:border-blue-600 focus:ring-2 focus:ring-blue-400"
+                    className="w-14 h-14 text-center text-2xl font-extrabold text-white bg-[#00112d] border border-gray-600 rounded p-4 outline-none focus:bg-[#000e2d] focus:border-blue-600 focus:ring-2 focus:ring-blue-400"
                     value={digit}
                     onChange={(e) => handleInputChange(e, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
