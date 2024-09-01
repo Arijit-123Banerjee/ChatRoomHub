@@ -2,37 +2,21 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
-import {
-  collection,
-  query,
-  onSnapshot,
-  addDoc,
-  orderBy,
-} from "firebase/firestore";
-import { db } from "../../firebase";
-import useAuth from "../hooks/useAuth";
 
 const ChatSection = ({ roomName, onExit, onBack }) => {
-  const { currentUser } = useAuth(); // Get current user from auth
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Fetch messages from Firestore
+  // Simulate fetching messages
   useEffect(() => {
-    const messagesRef = collection(db, `rooms/${roomName}/messages`);
-    const q = query(messagesRef, orderBy("timestamp"));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const messagesList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setMessages(messagesList);
-    });
-
-    return () => unsubscribe();
+    // Simulated messages
+    const simulatedMessages = [
+      { id: "1", sender: "user1", text: "Hello!", timestamp: new Date() },
+      { id: "2", sender: "user2", text: "Hi there!", timestamp: new Date() },
+    ];
+    setMessages(simulatedMessages);
   }, [roomName]);
 
   // Scroll to the bottom of the messages
@@ -41,19 +25,16 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
   }, [messages]);
 
   // Handle sending messages
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (newMessage.trim() !== "") {
-      try {
-        const messagesRef = collection(db, `rooms/${roomName}/messages`);
-        await addDoc(messagesRef, {
-          sender: currentUser.uid, // Save the sender's UID
-          text: newMessage,
-          timestamp: new Date(), // Timestamp for sorting
-        });
-        setNewMessage(""); // Clear input after sending
-      } catch (error) {
-        console.error("Error sending message: ", error);
-      }
+      const newMsg = {
+        id: (messages.length + 1).toString(), // Simple ID generation
+        sender: "currentUser", // Placeholder for current user
+        text: newMessage,
+        timestamp: new Date(),
+      };
+      setMessages([...messages, newMsg]);
+      setNewMessage(""); // Clear input after sending
     }
   };
 
@@ -110,20 +91,20 @@ const ChatSection = ({ roomName, onExit, onBack }) => {
             <div
               key={message.id}
               className={`flex ${
-                message.sender === currentUser.uid
+                message.sender === "currentUser"
                   ? "justify-end"
                   : "justify-start"
               }`}
             >
               <div
                 className={`${
-                  message.sender === currentUser.uid
+                  message.sender === "currentUser"
                     ? "bg-gradient-to-r from-[#003366] to-[#004080] text-white"
                     : "bg-[#002244] text-gray-300"
                 } max-w-xs p-3 rounded-lg shadow-md`}
               >
                 <div className="font-medium">
-                  {message.sender === currentUser.uid ? "You" : "Other User"}
+                  {message.sender === "currentUser" ? "You" : "Other User"}
                 </div>
                 <div className="text-sm">{message.text}</div>
               </div>

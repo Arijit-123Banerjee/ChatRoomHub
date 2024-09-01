@@ -1,41 +1,57 @@
-import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
 import { FaGoogle } from "react-icons/fa";
-import LoadingSpinner from "../Components/LoadingSpinner"; // Import the loading spinner
+import LoadingSpinner from "../Components/LoadingSpinner";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Track loading state
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Check if the user is already signed in when the component mounts
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigate("/app"); // Redirect to /app if user is already signed in
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     if (!email || !password) {
       setError("Please enter both email and password");
-      setIsLoading(false); // Stop loading on error
+      setIsLoading(false);
       return;
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log("Login Successful!", userCredential);
+      await signInWithEmailAndPassword(auth, email, password);
       setError("");
-      navigate("/app"); // Redirect to the main app after successful login
-    } catch (err) {
-      console.log(err);
-      setError(err.message);
+      navigate("/app");
+    } catch (error) {
+      console.error("Login failed", error);
+      setError("Login failed");
     } finally {
-      setIsLoading(false); // Stop loading after processing
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+      navigate("/app");
+    } catch (error) {
+      console.error("Google Sign-In failed", error);
+      setError("Google Sign-In failed");
     }
   };
 
@@ -105,6 +121,7 @@ const Login = () => {
         </div>
         <button
           type="button"
+          onClick={handleGoogleSignIn}
           className="w-full py-2 mt-4 bg-gray-800 text-gray-200 rounded-lg shadow-lg flex items-center justify-center gap-3 transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
         >
           <FaGoogle className="w-5 h-5" />

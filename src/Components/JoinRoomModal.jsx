@@ -1,4 +1,3 @@
-// JoinRoomModal.js
 import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
@@ -58,7 +57,7 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
               <h1 className="text-2xl font-bold mb-1 text-white">
                 Enter Room Key
               </h1>
-              <p className="text-[15px] text-gray-400">
+              <p className="text-sm text-gray-400">
                 Enter the 4-digit key to join the private room.
               </p>
             </header>

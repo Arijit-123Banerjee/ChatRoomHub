@@ -1,105 +1,78 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import CreateRoomModal from "./CreateRoomModal";
 import JoinRoomModal from "./JoinRoomModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { CiLock } from "react-icons/ci";
 import { TfiWorld } from "react-icons/tfi";
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
-import { db } from "../../firebase";
-import useAuth from "../hooks/useAuth";
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
-  const { currentUser } = useAuth(); // Ensure this hook provides the current user
   const [searchTerm, setSearchTerm] = useState("");
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState([]); // Initialize with an empty array or pre-loaded data
   const [modalOpen, setModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [expectedKey, setExpectedKey] = useState("");
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "rooms"),
-      (snapshot) => {
-        const roomsList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setRooms(roomsList);
-      },
-      (error) => {
-        console.error("Error fetching rooms: ", error);
-      }
-    );
+  // Example function for adding a room, you can replace this with your own logic
+  const handleCreateRoom = (newRoom) => {
+    const newRoomsList = [...rooms, { ...newRoom, members: [] }];
+    setRooms(newRoomsList);
+    setModalOpen(false);
+  };
 
-    return () => unsubscribe();
-  }, []);
-
+  // Function to filter rooms based on the search term
   const filteredRooms = rooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateRoom = async (newRoom) => {
-    try {
-      await addDoc(collection(db, "rooms"), {
-        name: newRoom.name,
-        status: newRoom.status,
-        roomKey: newRoom.roomKey || "", // Store the room key if the room is private
-        members: 0, // Initialize members count
-        memberUIDs: [], // Initialize empty array for member user IDs
-      });
-      setModalOpen(false); // Close the modal after creating the room
-    } catch (error) {
-      console.error("Error adding room: ", error);
-    }
-  };
-
+  // Handle room selection
   const handleRoomSelect = (room) => {
     if (room.status === "Public") {
       setSelectedRoom(room);
       setConfirmationModalOpen(true);
     } else {
-      setExpectedKey(room.roomKey); // Set the expected key for private rooms
+      setExpectedKey(room.roomKey);
       setSelectedRoom(room);
-      setJoinModalOpen(true); // Open join modal for private rooms
+      setJoinModalOpen(true);
     }
   };
 
+  // Confirm joining a public room
   const handleConfirmJoinRoom = () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
     onRoomSelect(selectedRoom);
     setConfirmationModalOpen(false);
   };
 
+  // Cancel joining a room
   const handleCancelJoinRoom = () => {
     setConfirmationModalOpen(false);
   };
 
-  const handleJoin = async () => {
+  // Handle joining a private room
+  const handleJoin = () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
 
-    // Update the room document with the new member's UID
-    try {
-      const roomRef = doc(db, "rooms", selectedRoom.id);
+    const updatedRooms = rooms.map((room) =>
+      room.id === selectedRoom.id
+        ? {
+            ...room,
+            members: [
+              ...room.members,
+              {
+                uid: "user-uid",
+                email: "user-email",
+                displayName: "user-name",
+              },
+            ],
+          }
+        : room
+    );
 
-      // Update room document to include the new member's UID
-      await updateDoc(roomRef, {
-        memberUIDs: [...selectedRoom.memberUIDs, currentUser.uid],
-        members: selectedRoom.members + 1, // Increment the members count
-      });
-
-      onRoomSelect(selectedRoom);
-      setJoinModalOpen(false);
-    } catch (error) {
-      console.error("Error joining room: ", error);
-    }
+    setRooms(updatedRooms);
+    onRoomSelect(selectedRoom);
+    setJoinModalOpen(false);
   };
 
   return (
@@ -157,7 +130,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
                   </div>
                 </div>
                 <div className="text-sm text-gray-400">
-                  Members: {room.members}
+                  Members: {room.members?.length || 0}
                 </div>
               </div>
             ))

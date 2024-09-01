@@ -1,28 +1,34 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth"; // Ensure the correct path to your hook
 import image from "../assets/landingPageImage.png";
 import { Link } from "react-router-dom";
 import BackgroundImage from "../assets/backgroundimg.jpg";
 import LoadingSpinner from "../Components/LoadingSpinner";
+import { auth } from "../firebase"; // Ensure the path to your firebase configuration is correct
+import { onAuthStateChanged } from "firebase/auth"; // Import Firebase Auth function
 
 const LandingPage = () => {
+  // Refs for DOM elements to animate with GSAP
   const headingRef = useRef(null);
   const subHeadingRef = useRef(null);
   const buttonsRef = useRef(null);
   const imageRef = useRef(null);
-  const getStarted = useRef(null);
+  const getStartedRef = useRef(null);
+
+  // Navigation hook to programmatically navigate between routes
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
 
+  // Effect to run animations using GSAP when the component mounts
   useEffect(() => {
-    if (!loading && user) {
-      navigate("/app");
-    }
-  }, [user, loading, navigate]);
+    // Check authentication state on component mount
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigate("/app"); // Redirect to /app if user is authenticated
+      }
+    });
 
-  useEffect(() => {
+    // GSAP animations
     gsap.fromTo(
       headingRef.current,
       { opacity: 0, y: -50 },
@@ -48,13 +54,14 @@ const LandingPage = () => {
     );
 
     gsap.fromTo(
-      getStarted.current,
+      getStartedRef.current,
       { opacity: 0, x: 50 },
       { opacity: 1, x: 0, duration: 1, ease: "elastic", delay: 1.8 }
     );
-  }, []);
 
-  if (loading) return <LoadingSpinner />;
+    // Cleanup the subscription on unmount
+    return () => unsubscribe();
+  }, [navigate]);
 
   return (
     <section
@@ -63,12 +70,15 @@ const LandingPage = () => {
     >
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
         <div className="max-w-3xl mx-auto">
+          {/* Heading Section */}
           <h1
             className="text-lg text-gray-400 font-inter mb-4"
             ref={headingRef}
           >
             Smart Communication Hub, Designed for Seamless Collaboration
           </h1>
+
+          {/* Subheading Section with a highlighted word */}
           <p
             className="text-4xl font-bold leading-tight text-gray-100 sm:text-5xl lg:text-6xl font-pj mb-6"
             ref={subHeadingRef}
@@ -79,6 +89,8 @@ const LandingPage = () => {
               <span className="relative text-cyan-400"> effortlessly </span>
             </span>
           </p>
+
+          {/* Buttons Section for Navigation */}
           <div
             className="flex flex-col sm:flex-row sm:space-x-4 sm:justify-center mb-12"
             ref={buttonsRef}
@@ -96,12 +108,16 @@ const LandingPage = () => {
               Sign Up Free
             </Link>
           </div>
+
+          {/* Get Started Text Section */}
           <p
-            className=" text-base text-gray-400 font-inter mb-8"
-            ref={getStarted}
+            className="text-base text-gray-400 font-inter mb-8"
+            ref={getStartedRef}
           >
             Get started with effortless communication
           </p>
+
+          {/* Illustration Image Section */}
           <img
             src={image}
             alt="Illustration"

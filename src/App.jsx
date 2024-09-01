@@ -4,34 +4,48 @@ import Sidebar from "./Components/Sidebar";
 import ConfirmationModal from "./Components/ConfirmationModal";
 
 const App = () => {
+  // State to keep track of the selected room
   const [selectedRoom, setSelectedRoom] = useState(null);
+
+  // State to control the visibility of the sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // State to control the visibility of the confirmation modal
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
+  // Handler for selecting a room from the sidebar
   const handleRoomSelect = (room) => {
     if (room.status === "Private") {
+      // If the room is private, open the confirmation modal
       setSelectedRoom(room);
-      setConfirmationModalOpen(true); // Open confirmation modal for private rooms
+      setConfirmationModalOpen(true);
     } else {
+      // If the room is public, simply select it and close the sidebar on mobile
       setSelectedRoom(room);
-      if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+      if (window.innerWidth <= 768) setSidebarOpen(false);
     }
   };
 
+  // Handler for confirming to join a private room
   const handleConfirmJoin = () => {
     setConfirmationModalOpen(false);
-    if (window.innerWidth <= 768) setSidebarOpen(false); // Hide sidebar on mobile
+    // Close the sidebar on mobile after joining the room
+    if (window.innerWidth <= 768) setSidebarOpen(false);
   };
 
+  // Handler for exiting the currently selected room
   const handleExitRoom = () => {
     setSelectedRoom(null);
-    if (window.innerWidth <= 768) setSidebarOpen(true); // Show sidebar on mobile
+    // Show the sidebar on mobile when exiting the room
+    if (window.innerWidth <= 768) setSidebarOpen(true);
   };
 
-  const handleBackToSidebar = () => setSidebarOpen(true); // Show sidebar on back action
+  // Handler for going back to the sidebar from the chat section
+  const handleBackToSidebar = () => setSidebarOpen(true);
 
   return (
     <div className="flex h-screen bg-[#000e2d]">
+      {/* Sidebar is conditionally rendered based on sidebarOpen state */}
       {sidebarOpen && (
         <Sidebar
           onRoomSelect={handleRoomSelect}
@@ -39,6 +53,7 @@ const App = () => {
         />
       )}
 
+      {/* Main chat section or a placeholder when no room is selected */}
       <div
         className={`flex-1 ${
           sidebarOpen ? "hidden md:flex" : "flex"
@@ -57,6 +72,7 @@ const App = () => {
         )}
       </div>
 
+      {/* Confirmation modal is conditionally rendered */}
       <ConfirmationModal
         isOpen={confirmationModalOpen}
         onClose={() => setConfirmationModalOpen(false)}
