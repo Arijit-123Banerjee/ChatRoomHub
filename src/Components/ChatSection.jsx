@@ -4,11 +4,11 @@ import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
 import {
   doc,
-  collection,
-  addDoc,
   onSnapshot,
   updateDoc,
   arrayUnion,
+  setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { database as db } from "../firebase";
 import { auth } from "../firebase";
@@ -17,9 +17,11 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [typing, setTyping] = useState(null);
+  const [typingTimeout, setTypingTimeout] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Fetch messages from Firestore
+  // Fetch messages and typing status from Firestore
   useEffect(() => {
     const roomRef = doc(db, "rooms", roomId);
 
@@ -27,6 +29,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
       const roomData = snapshot.data();
       if (roomData) {
         setMessages(roomData.messages || []);
+        setTyping(roomData.typing || null);
       }
     });
 
@@ -57,9 +60,45 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
         });
 
         setNewMessage(""); // Clear input after sending
+        // Clear typing status after sending a message
+        await setDoc(roomRef, { typing: null }, { merge: true });
       } catch (error) {
         console.error("Failed to send message", error);
       }
+    }
+  };
+
+  // Handle typing status
+  const handleTyping = async () => {
+    // Clear the previous typing timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    try {
+      const roomRef = doc(db, "rooms", roomId);
+
+      // Update typing status to Firestore
+      await setDoc(
+        roomRef,
+        {
+          typing: {
+            uid: auth.currentUser.uid,
+            name: auth.currentUser.displayName || "Anonymous",
+            timestamp: serverTimestamp(),
+          },
+        },
+        { merge: true }
+      );
+
+      // Set a timeout to clear typing status after 1 second of inactivity
+      const timeout = setTimeout(async () => {
+        await setDoc(roomRef, { typing: null }, { merge: true });
+      }, 1000);
+
+      setTypingTimeout(timeout);
+    } catch (error) {
+      console.error("Failed to update typing status", error);
     }
   };
 
@@ -92,8 +131,8 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
 
   // Format timestamp for display
   const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp); // Use ISO date string directly
-    return date.toLocaleString(); // Format date and time
+    const date = new Date(timestamp);
+    return date.toLocaleString();
   };
 
   return (
@@ -185,6 +224,12 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
               </div>
             </div>
           ))}
+          {/* Typing Indicator */}
+          {typing && (
+            <div className="flex justify-start items-center mb-4 text-gray-300">
+              <div className="animate-pulse">Typing...</div>
+            </div>
+          )}
           <div ref={messagesEndRef} /> {/* Scroll reference */}
         </div>
       </div>
@@ -196,7 +241,10 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           placeholder="Type your message..."
           className="flex-1 px-4 py-2 border border-[#16253d] bg-[#00112d] rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-[#003366] text-gray-200 placeholder-gray-500"
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={(e) => {
+            setNewMessage(e.target.value);
+            handleTyping(); // Update typing status on input change
+          }}
         />
         <button
           className="ml-4 bg-gradient-to-r from-[#003366] to-[#004080] text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#003366]"
