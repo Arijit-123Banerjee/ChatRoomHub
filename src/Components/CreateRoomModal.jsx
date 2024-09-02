@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { TfiWorld } from "react-icons/tfi";
 import { CiLock } from "react-icons/ci";
-import { database as db, auth } from "../firebase"; // Import Firestore and Firebase auth
-import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import { database as db } from "../firebase"; // Import Firestore
+import { doc, setDoc } from "firebase/firestore";
+import { auth } from "../firebase";
 
-const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
+const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
   const [roomName, setRoomName] = useState("");
   const [status, setStatus] = useState("Public");
   const [roomKey, setRoomKey] = useState("");
@@ -16,51 +17,54 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
     setRoomKey(key);
   };
 
+  // Handle status change
+  const handleStatusChange = (newStatus) => {
+    setStatus(newStatus);
+    if (newStatus === "Private") {
+      generateRoomKey(); // Generate a room key if private
+    } else {
+      setRoomKey(""); // Clear room key if public
+    }
+  };
+
   // Handle room creation logic
   const handleCreate = async () => {
-    if (roomName && user) {
+    if (roomName && auth.currentUser) {
       try {
+        const userId = auth.currentUser.uid;
+
         // Create room data
         const roomData = {
           name: roomName,
-          status,
-          roomKey: status === "Private" ? roomKey : null,
-          members: [
-            user.uid,
-          ],
-          memberCount: 1, // Initialize with 1 member (the creator)
+          users: [userId], // Initialize with the creator
+          messages: [], // Empty messages array initially
         };
 
-        // Store the room data in Firestore
-        const roomDocRef = await addDoc(collection(db, "rooms"), roomData);
-
-        // Create the member document with a demo message
-        const memberDocRef = doc(db, "members", user.uid);
-        const memberData = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName || "Unknown",
-          messages: [
-            {
-              id: "demo-message-1", // Demo message ID
-              text: "Welcome to the room! Feel free to introduce yourself.",
-              timestamp: new Date().toISOString(), // Use the current timestamp
-            },
-          ],
-        };
-
-        // Check if member document already exists
-        const memberDoc = await getDoc(memberDocRef);
-        if (!memberDoc.exists()) {
-          // Store the member data in Firestore
-          await setDoc(memberDocRef, memberData);
+        if (status === "Private") {
+          roomData.roomKey = roomKey;
         }
 
-        // Update room with member document ID
-        await setDoc(roomDocRef, { members: [user.uid] }, { merge: true });
+        // Store the room data in Firestore
+        const roomRef = doc(db, "rooms", roomName); // Use room name or generate unique ID for the room
+        await setDoc(roomRef, roomData);
+
+        // Create a demo message in the room
+        const demoMessage = {
+          senderUid: userId,
+          content: "Welcome to the room! Feel free to introduce yourself.",
+          timestamp: new Date().toISOString(), // Use the current timestamp
+        };
+
+        await setDoc(
+          roomRef,
+          {
+            messages: [demoMessage],
+          },
+          { merge: true }
+        );
 
         // Call the onCreate callback with the new room data
-        onCreate({ ...roomData, id: roomDocRef.id });
+        onCreate({ ...roomData, id: roomName, status }); // Pass status to identify room type
 
         // Reset state after room creation
         setRoomName("");
@@ -104,10 +108,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
                 <div className="flex space-x-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      setStatus("Public");
-                      setRoomKey(""); // Clear room key for public rooms
-                    }}
+                    onClick={() => handleStatusChange("Public")}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Public"
                         ? "bg-blue-600 text-white border-teal-600"
@@ -119,10 +120,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setStatus("Private");
-                      generateRoomKey(); // Generate a room key for private rooms
-                    }}
+                    onClick={() => handleStatusChange("Private")}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Private"
                         ? "bg-red-600 text-white border-red-600"

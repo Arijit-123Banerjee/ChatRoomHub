@@ -1,9 +1,15 @@
-// src/Components/ChatSection.js
 import React, { useState, useEffect, useRef } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
-import { collection, addDoc, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import {
+  doc,
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import { database as db } from "../firebase";
 import { auth } from "../firebase";
 
@@ -15,15 +21,13 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
 
   // Fetch messages from Firestore
   useEffect(() => {
-    const messagesQuery = query(
-      collection(db, "messages"),
-      where("roomId", "==", roomId),
-      orderBy("timestamp", "asc")
-    );
+    const roomRef = doc(db, "rooms", roomId);
 
-    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-      const fetchedMessages = snapshot.docs.map((doc) => doc.data());
-      setMessages(fetchedMessages);
+    const unsubscribe = onSnapshot(roomRef, (snapshot) => {
+      const roomData = snapshot.data();
+      if (roomData) {
+        setMessages(roomData.messages || []);
+      }
     });
 
     return () => unsubscribe(); // Clean up subscription on component unmount
@@ -38,12 +42,20 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const handleSendMessage = async () => {
     if (newMessage.trim() !== "") {
       try {
-        await addDoc(collection(db, "messages"), {
-          roomId,
-          senderId: auth.currentUser.uid,
-          text: newMessage,
-          timestamp: new Date(),
+        const message = {
+          senderUid: auth.currentUser.uid,
+          content: newMessage,
+          timestamp: new Date().toISOString(),
+          name: auth.currentUser.displayName || "Anonymous", // Use user name if available
+        };
+
+        const roomRef = doc(db, "rooms", roomId);
+
+        // Update the messages array in the room document
+        await updateDoc(roomRef, {
+          messages: arrayUnion(message),
         });
+
         setNewMessage(""); // Clear input after sending
       } catch (error) {
         console.error("Failed to send message", error);
@@ -59,7 +71,10 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     let currentGroup = [];
 
     messages.forEach((message, index) => {
-      if (currentGroup.length === 0 || message.senderId === currentGroup[0].senderId) {
+      if (
+        currentGroup.length === 0 ||
+        message.senderUid === currentGroup[0].senderUid
+      ) {
         currentGroup.push(message);
       } else {
         grouped.push(currentGroup);
@@ -77,7 +92,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
 
   // Format timestamp for display
   const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
+    const date = new Date(timestamp); // Use ISO date string directly
     return date.toLocaleString(); // Format date and time
   };
 
@@ -129,13 +144,26 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
       <div className="flex-1 overflow-y-auto mb-4 chat">
         <div className="space-y-4">
           {groupedMessages.map((messageGroup, index) => (
-            <div key={index} className={`flex ${messageGroup[0].senderId === auth.currentUser.uid ? "justify-end" : "justify-start"}`}>
-              <div className={`flex flex-col ${messageGroup[0].senderId === auth.currentUser.uid ? "items-end" : "items-start"}`}>
+            <div
+              key={index}
+              className={`flex ${
+                messageGroup[0].senderUid === auth.currentUser.uid
+                  ? "justify-end"
+                  : "justify-start"
+              }`}
+            >
+              <div
+                className={`flex flex-col ${
+                  messageGroup[0].senderUid === auth.currentUser.uid
+                    ? "items-end"
+                    : "items-start"
+                }`}
+              >
                 {messageGroup.map((message, idx) => (
                   <div
                     key={idx}
                     className={`${
-                      message.senderId === auth.currentUser.uid
+                      message.senderUid === auth.currentUser.uid
                         ? "bg-gradient-to-r from-[#003366] to-[#004080] text-white"
                         : "bg-[#002244] text-gray-300"
                     } max-w-xs p-3 rounded-lg shadow-md mb-1`}
@@ -143,11 +171,15 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                     {/* Display sender's name only for the first message in the group */}
                     {messageGroup.length > 1 && idx === 0 && (
                       <div className="font-medium">
-                        {message.senderId === auth.currentUser.uid ? "You" : "Other User"}
+                        {message.senderUid === auth.currentUser.uid
+                          ? "You"
+                          : message.name}
                       </div>
                     )}
-                    <div className="text-sm">{message.text}</div>
-                    <div className="text-xs text-gray-400 mt-1">{formatTimestamp(message.timestamp)}</div>
+                    <div className="text-sm">{message.content}</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {formatTimestamp(message.timestamp)}
+                    </div>
                   </div>
                 ))}
               </div>
