@@ -9,7 +9,7 @@ import { TfiWorld } from "react-icons/tfi";
 import { signOut } from "firebase/auth";
 import { auth, database } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
-import { AddUserToRoom } from "./AddUserToRoom";
+import {AddUserToRoom} from '../Components/AddUserToRoom'
 
 const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");

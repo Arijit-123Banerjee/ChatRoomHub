@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { TfiWorld } from "react-icons/tfi";
 import { CiLock } from "react-icons/ci";
-import { database as db } from "../firebase"; // Import Firestore
-import { collection, addDoc } from "firebase/firestore";
-import { auth } from "../firebase"; // Import Firebase auth
+import { database as db, auth } from "../firebase"; // Import Firestore and Firebase auth
+import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
 
 const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
   const [roomName, setRoomName] = useState("");
@@ -21,25 +20,47 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate, user }) => {
   const handleCreate = async () => {
     if (roomName && user) {
       try {
+        // Create room data
         const roomData = {
           name: roomName,
           status,
           roomKey: status === "Private" ? roomKey : null,
           members: [
-            {
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName || "Unknown",
-            },
+            user.uid,
           ],
           memberCount: 1, // Initialize with 1 member (the creator)
         };
 
         // Store the room data in Firestore
-        const docRef = await addDoc(collection(db, "rooms"), roomData);
+        const roomDocRef = await addDoc(collection(db, "rooms"), roomData);
+
+        // Create the member document with a demo message
+        const memberDocRef = doc(db, "members", user.uid);
+        const memberData = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || "Unknown",
+          messages: [
+            {
+              id: "demo-message-1", // Demo message ID
+              text: "Welcome to the room! Feel free to introduce yourself.",
+              timestamp: new Date().toISOString(), // Use the current timestamp
+            },
+          ],
+        };
+
+        // Check if member document already exists
+        const memberDoc = await getDoc(memberDocRef);
+        if (!memberDoc.exists()) {
+          // Store the member data in Firestore
+          await setDoc(memberDocRef, memberData);
+        }
+
+        // Update room with member document ID
+        await setDoc(roomDocRef, { members: [user.uid] }, { merge: true });
 
         // Call the onCreate callback with the new room data
-        onCreate({ ...roomData, id: docRef.id });
+        onCreate({ ...roomData, id: roomDocRef.id });
 
         // Reset state after room creation
         setRoomName("");

@@ -48,6 +48,7 @@ const App = () => {
             roomName={selectedRoom.name}
             onExit={handleExitRoom}
             onBack={handleBackToSidebar}
+            roomId={selectedRoom.id} // Pass the roomId
           />
         ) : (
           <div className="flex-1 h-screen flex items-center justify-center text-gray-300 bg-[#000e2d]">
