@@ -9,6 +9,7 @@ import {
   arrayUnion,
   setDoc,
   serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 import { database as db } from "../firebase";
 import { auth } from "../firebase";
@@ -19,6 +20,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [typing, setTyping] = useState(null);
   const [typingTimeout, setTypingTimeout] = useState(null);
+  const [usernames, setUsernames] = useState({}); // Store usernames with UID as key
   const messagesEndRef = useRef(null);
 
   // Fetch messages and typing status from Firestore
@@ -35,6 +37,30 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
 
     return () => unsubscribe(); // Clean up subscription on component unmount
   }, [roomId]);
+
+  // Fetch usernames from Firestore and update state
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      const messages = messages.map((message) => message.senderUid);
+      const uniqueUserIds = [...new Set(messages)];
+
+      const userDocs = await Promise.all(
+        uniqueUserIds.map((uid) => getDoc(doc(db, "users", uid)))
+      );
+
+      const newUsernames = userDocs.reduce((acc, doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          acc[doc.id] = data.username;
+        }
+        return acc;
+      }, {});
+
+      setUsernames(newUsernames);
+    };
+
+    fetchUsernames();
+  }, [messages]);
 
   // Scroll to the bottom of the messages
   useEffect(() => {
@@ -212,7 +238,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                       <div className="font-medium">
                         {message.senderUid === auth.currentUser.uid
                           ? "You"
-                          : message.name}
+                          : usernames[message.senderUid] || "Unknown"}
                       </div>
                     )}
                     <div className="text-sm">{message.content}</div>
@@ -227,7 +253,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           {/* Typing Indicator */}
           {typing && (
             <div className="flex justify-start items-center mb-4 text-gray-300">
-              <div className="animate-pulse">Typing...</div>
+              <div className="animate-pulse">{typing.name} is typing...</div>
             </div>
           )}
           <div ref={messagesEndRef} /> {/* Scroll reference */}
