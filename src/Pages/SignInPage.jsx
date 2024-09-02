@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../Components/LoadingSpinner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 
 const SignInPage = () => {
   const [username, setUsername] = useState("");
@@ -32,8 +32,8 @@ const SignInPage = () => {
       const user = userCredential.user;
 
       // Store user info in Firestore
-      await addDoc(collection(database, "users"), {
-        uid: user.uid,
+      const userDocRef = doc(database, "users", user.uid);
+      await setDoc(userDocRef, {
         username,
         email,
       });
