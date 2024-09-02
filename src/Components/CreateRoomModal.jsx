@@ -38,10 +38,11 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
           name: roomName,
           users: [userId], // Initialize with the creator
           messages: [], // Empty messages array initially
+          status, // Add status here
         };
 
         if (status === "Private") {
-          roomData.roomKey = roomKey;
+          roomData.roomKey = roomKey; // Add room key if private
         }
 
         // Store the room data in Firestore
@@ -64,7 +65,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
         );
 
         // Call the onCreate callback with the new room data
-        onCreate({ ...roomData, id: roomName, status }); // Pass status to identify room type
+        onCreate({ ...roomData, id: roomName });
 
         // Reset state after room creation
         setRoomName("");

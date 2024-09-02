@@ -19,7 +19,7 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" || e.key === "Delete") {
-      if (index > 0) {
+      if (index > 0 && otp[index] === "") {
         document.getElementById(`otp-${index - 1}`).focus();
       }
     }
@@ -43,7 +43,7 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
       setOtp(["", "", "", ""]);
     } else {
       setError("Incorrect key. Please try again.");
-      setOtp(["", "", "", ""]);
+      setTimeout(() => setError(""), 3000); // Clear error message after 3 seconds
     }
   };
 
