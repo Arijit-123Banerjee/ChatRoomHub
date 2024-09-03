@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiSend } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
@@ -9,10 +9,32 @@ import {
   arrayUnion,
   setDoc,
   serverTimestamp,
-  getDoc,
+  getDocs,
+  collection,
+  getFirestore,
 } from "firebase/firestore";
-import { database as db } from "../firebase";
+import { app, database as db } from "../firebase";
 import { auth } from "../firebase";
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
+// Utility function to group messages
+const groupMessages = (messages) => {
+  return messages.reduce((acc, message) => {
+    if (
+      acc.length === 0 ||
+      message.senderUid !== acc[acc.length - 1][0].senderUid
+    ) {
+      acc.push([message]);
+    } else {
+      acc[acc.length - 1].push(message);
+    }
+    return acc;
+  }, []);
+};
 
 const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const [messages, setMessages] = useState([]);
@@ -20,8 +42,30 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [typing, setTyping] = useState(null);
   const [typingTimeout, setTypingTimeout] = useState(null);
-  const [usernames, setUsernames] = useState({}); // Store usernames with UID as key
+  const [usernames, setUsernames] = useState({});
   const messagesEndRef = useRef(null);
+
+  // Function to fetch user data
+  const getUserData = async () => {
+    try {
+      const db = getFirestore(app);
+      const docref = collection(db, "users");
+      const docsnap = await getDocs(docref);
+      const data = docsnap.docs.reduce((acc, doc) => {
+        const userData = doc.data();
+        acc[doc.id] = userData.username; // Assuming `username` is a field in your `users` collection
+        return acc;
+      }, {});
+      setUsernames(data);
+    } catch (error) {
+      console.error("Failed to fetch user data", error);
+    }
+  };
+
+  // Call getUserData on component mount
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   // Fetch messages and typing status from Firestore
   useEffect(() => {
@@ -38,73 +82,19 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     return () => unsubscribe(); // Clean up subscription on component unmount
   }, [roomId]);
 
-  // Fetch usernames from Firestore and update state
-  useEffect(() => {
-    const fetchUsernames = async () => {
-      const messages = messages.map((message) => message.senderUid);
-      const uniqueUserIds = [...new Set(messages)];
-
-      const userDocs = await Promise.all(
-        uniqueUserIds.map((uid) => getDoc(doc(db, "users", uid)))
-      );
-
-      const newUsernames = userDocs.reduce((acc, doc) => {
-        if (doc.exists()) {
-          const data = doc.data();
-          acc[doc.id] = data.username;
-        }
-        return acc;
-      }, {});
-
-      setUsernames(newUsernames);
-    };
-
-    fetchUsernames();
-  }, [messages]);
-
   // Scroll to the bottom of the messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle sending messages
-  const handleSendMessage = async () => {
-    if (newMessage.trim() !== "") {
-      try {
-        const message = {
-          senderUid: auth.currentUser.uid,
-          content: newMessage,
-          timestamp: new Date().toISOString(),
-          name: auth.currentUser.displayName || "Anonymous", // Use user name if available
-        };
-
-        const roomRef = doc(db, "rooms", roomId);
-
-        // Update the messages array in the room document
-        await updateDoc(roomRef, {
-          messages: arrayUnion(message),
-        });
-
-        setNewMessage(""); // Clear input after sending
-        // Clear typing status after sending a message
-        await setDoc(roomRef, { typing: null }, { merge: true });
-      } catch (error) {
-        console.error("Failed to send message", error);
-      }
-    }
-  };
-
-  // Handle typing status
-  const handleTyping = async () => {
-    // Clear the previous typing timeout
+  // Debounce typing status updates
+  const handleTyping = useCallback(async () => {
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
 
     try {
       const roomRef = doc(db, "rooms", roomId);
-
-      // Update typing status to Firestore
       await setDoc(
         roomRef,
         {
@@ -117,7 +107,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
         { merge: true }
       );
 
-      // Set a timeout to clear typing status after 1 second of inactivity
       const timeout = setTimeout(async () => {
         await setDoc(roomRef, { typing: null }, { merge: true });
       }, 1000);
@@ -126,40 +115,32 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     } catch (error) {
       console.error("Failed to update typing status", error);
     }
+  }, [roomId, typingTimeout]);
+
+  // Handle sending messages
+  const handleSendMessage = async () => {
+    if (newMessage.trim() !== "") {
+      try {
+        const message = {
+          senderUid: auth.currentUser.uid,
+          content: newMessage,
+          timestamp: new Date().toISOString(),
+          name: auth.currentUser.displayName || "Anonymous",
+        };
+
+        const roomRef = doc(db, "rooms", roomId);
+        await updateDoc(roomRef, { messages: arrayUnion(message) });
+        setNewMessage(""); // Clear input after sending
+        await setDoc(roomRef, { typing: null }, { merge: true }); // Clear typing status
+      } catch (error) {
+        console.error("Failed to send message", error);
+      }
+    }
   };
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-  // Group messages to display consecutive messages from the same user in one block
-  const groupMessages = (messages) => {
-    const grouped = [];
-    let currentGroup = [];
-
-    messages.forEach((message, index) => {
-      if (
-        currentGroup.length === 0 ||
-        message.senderUid === currentGroup[0].senderUid
-      ) {
-        currentGroup.push(message);
-      } else {
-        grouped.push(currentGroup);
-        currentGroup = [message];
-      }
-      if (index === messages.length - 1) {
-        grouped.push(currentGroup);
-      }
-    });
-
-    return grouped;
-  };
-
   const groupedMessages = groupMessages(messages);
-
-  // Format timestamp for display
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
 
   return (
     <div className="flex flex-col h-screen w-full bg-[#000e2d] text-gray-100 p-4 sm:p-6 shadow-2xl border-l border-[#000e2d]">
@@ -233,17 +214,13 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                         : "bg-[#002244] text-gray-300"
                     } max-w-xs p-3 rounded-lg shadow-md mb-1`}
                   >
-                    {/* Display sender's name only for the first message in the group */}
-                    {messageGroup.length > 1 && idx === 0 && (
-                      <div className="font-medium">
-                        {message.senderUid === auth.currentUser.uid
-                          ? "You"
-                          : usernames[message.senderUid] || "Unknown"}
-                      </div>
-                    )}
+                    {/* Display sender's name */}
+                    <div className="font-medium">
+                      {usernames[message.senderUid] || "Unknown"}
+                    </div>
                     <div className="text-sm">{message.content}</div>
                     <div className="text-xs text-gray-400 mt-1">
-                      {formatTimestamp(message.timestamp)}
+                      {formatTime(message.timestamp)}
                     </div>
                   </div>
                 ))}
@@ -253,7 +230,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           {/* Typing Indicator */}
           {typing && (
             <div className="flex justify-start items-center mb-4 text-gray-300">
-              <div className="animate-pulse">{typing.name} is typing...</div>
+              <div className="animate-pulse">Typing...</div>
             </div>
           )}
           <div ref={messagesEndRef} /> {/* Scroll reference */}

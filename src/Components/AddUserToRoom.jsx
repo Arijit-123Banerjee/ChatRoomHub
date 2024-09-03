@@ -1,5 +1,11 @@
 // src/utils/addUserToRoom.js
-import { doc, updateDoc, getDoc, arrayUnion, increment } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  getDoc,
+  arrayUnion,
+  increment,
+} from "firebase/firestore";
 import { database as db } from "../firebase";
 
 export const AddUserToRoom = async (roomId, user) => {
@@ -10,7 +16,7 @@ export const AddUserToRoom = async (roomId, user) => {
     if (roomSnapshot.exists()) {
       const roomData = roomSnapshot.data();
 
-      const isUserAlreadyMember = roomData.members.some(
+      const isUserAlreadyMember = roomData.members?.some(
         (member) => member.uid === user.uid
       );
 
