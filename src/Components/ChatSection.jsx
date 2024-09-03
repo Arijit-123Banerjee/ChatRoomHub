@@ -121,11 +121,12 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const handleSendMessage = async () => {
     if (newMessage.trim() !== "") {
       try {
+        const user = auth.currentUser;
         const message = {
-          senderUid: auth.currentUser.uid,
+          senderUid: user.uid,
           content: newMessage,
           timestamp: new Date().toISOString(),
-          name: auth.currentUser.displayName || "Anonymous",
+          name: user.displayName || usernames[user.uid] || "Anonymous", // Use displayName, fallback to usernames
         };
 
         const roomRef = doc(db, "rooms", roomId);
