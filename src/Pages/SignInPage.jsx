@@ -105,7 +105,7 @@ const SignInPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-100 placeholder-gray-500"
               placeholder="Enter your password"
-              required
+              requiredz
             />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
