@@ -1,34 +1,26 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
-import image from "../assets/landingPageImage.png";
 import { Link } from "react-router-dom";
-import BackgroundImage from "../assets/backgroundimg.jpg";
-import LoadingSpinner from "../Components/LoadingSpinner";
-import { auth } from "../firebase"; // Ensure the path to your firebase configuration is correct
-import { onAuthStateChanged } from "firebase/auth"; // Import Firebase Auth function
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
 
 const LandingPage = () => {
-  // Refs for DOM elements to animate with GSAP
   const headingRef = useRef(null);
   const subHeadingRef = useRef(null);
   const buttonsRef = useRef(null);
   const imageRef = useRef(null);
   const getStartedRef = useRef(null);
 
-  // Navigation hook to programmatically navigate between routes
   const navigate = useNavigate();
 
-  // Effect to run animations using GSAP when the component mounts
   useEffect(() => {
-    // Check authentication state on component mount
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigate("/app"); // Redirect to /app if user is authenticated
+        navigate("/app");
       }
     });
 
-    // GSAP animations
     gsap.fromTo(
       headingRef.current,
       { opacity: 0, y: -50 },
@@ -56,75 +48,66 @@ const LandingPage = () => {
     gsap.fromTo(
       getStartedRef.current,
       { opacity: 0, x: 50 },
-      { opacity: 1, x: 0, duration: 1, ease: "elastic", delay: 1.8 }
+      {
+        opacity: 1,
+        x: 0,
+        duration: 1,
+        ease: "elastic.out(1, 0.75)",
+        delay: 1.8,
+      }
     );
 
-    // Cleanup the subscription on unmount
     return () => unsubscribe();
   }, [navigate]);
 
   return (
-    <section
-      className="overflow-hidden pt-12 bg-gradient-to-br from-gray-900 to-gray-800 bg-cover bg-center min-h-screen flex flex-col justify-center"
-      style={{ backgroundImage: `url(${BackgroundImage})` }}
-    >
-      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
-        <div className="max-w-3xl mx-auto">
-          {/* Heading Section */}
-          <h1
-            className="text-lg text-gray-400 font-inter mb-4"
-            ref={headingRef}
-          >
-            Smart Communication Hub, Designed for Seamless Collaboration
-          </h1>
+    <section className="min-h-screen flex flex-col justify-center items-center bg-hero-illustration text-gray-900 relative overflow-hidden">
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-10">
+        <div className="w-96 h-96 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
+      </div>
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-20">
+        <div className="w-64 h-64 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full mix-blend-multiply filter blur-2xl relative"></div>
+      </div>
 
-          {/* Subheading Section with a highlighted word */}
-          <p
-            className="text-4xl font-bold leading-tight text-gray-100 sm:text-5xl lg:text-6xl font-pj mb-6"
-            ref={subHeadingRef}
+      <div className="text-center px-4 z-10">
+        <h1
+          className="text-4xl sm:text-5xl font-bold mb-6 tracking-wide leading-tight"
+          ref={headingRef}
+        >
+          Redefine Your Collaboration
+        </h1>
+        <p
+          className="text-6xl sm:text-7xl font-extrabold leading-tight mb-8 relative"
+          ref={subHeadingRef}
+        >
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-cyan-400">
+            Innovate
+          </span>{" "}
+          & Create
+        </p>
+        <div
+          className="flex flex-col sm:flex-row sm:space-x-6 justify-center mb-12"
+          ref={buttonsRef}
+        >
+          <Link
+            to="/app"
+            className="px-8 py-4 text-lg font-bold rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:scale-105 transform transition-transform duration-300 shadow-lg"
           >
-            Transform how you connect and collaborate
-            <span className="relative inline-flex">
-              <span className="bg-gradient-to-r from-cyan-700 to-blue-800 blur-md rounded-full filter opacity-30 absolute inset-0"></span>
-              <span className="relative text-cyan-400"> effortlessly </span>
-            </span>
-          </p>
-
-          {/* Buttons Section for Navigation */}
-          <div
-            className="flex flex-col sm:flex-row sm:space-x-4 sm:justify-center mb-12"
-            ref={buttonsRef}
+            Go to Dashboard
+          </Link>
+          <Link
+            to="/signin"
+            className="mt-4 sm:mt-0 px-8 py-4 text-lg font-bold rounded-full border border-blue-600 text-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            <Link
-              to="/app"
-              className="inline-flex items-center justify-center px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-cyan-700 to-blue-800 rounded-xl transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-100"
-            >
-              Go to Dashboard
-            </Link>
-            <Link
-              to="/signin"
-              className="inline-flex items-center justify-center px-8 py-3 mt-4 sm:mt-0 text-lg font-bold text-gray-500 border-2 border-transparent rounded-xl transition-transform transform hover:bg-gradient-to-r hover:from-cyan-700 hover:to-blue-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-100"
-            >
-              Sign Up Free
-            </Link>
-          </div>
-
-          {/* Get Started Text Section */}
-          <p
-            className="text-base text-gray-400 font-inter mb-8"
-            ref={getStartedRef}
-          >
-            Get started with effortless communication
-          </p>
-
-          {/* Illustration Image Section */}
-          <img
-            src={image}
-            alt="Illustration"
-            className="w-full h-auto max-w-3xl mx-auto rounded-2xl"
-            ref={imageRef}
-          />
+            Sign Up Free
+          </Link>
         </div>
+        <p
+          className="text-gray-600 text-lg mb-8 font-medium"
+          ref={getStartedRef}
+        >
+          Start your journey with us today
+        </p>
       </div>
     </section>
   );

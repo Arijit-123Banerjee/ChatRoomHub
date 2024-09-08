@@ -7,7 +7,6 @@ import "./index.css";
 import SignInPage from "./Pages/SignInPage.jsx";
 import Login from "./Pages/Login.jsx";
 
-// Configure routes
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,12 +21,11 @@ const router = createBrowserRouter([
     element: <SignInPage />,
   },
   {
-    path: "/login", // Add the login page route
+    path: "/login",
     element: <Login />,
   },
 ]);
 
-// Render the application
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <RouterProvider router={router} />

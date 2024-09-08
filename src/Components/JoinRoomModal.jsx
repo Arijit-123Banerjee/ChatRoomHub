@@ -43,7 +43,8 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
       setOtp(["", "", "", ""]);
     } else {
       setError("Incorrect key. Please try again.");
-      setTimeout(() => setError(""), 3000); // Clear error message after 3 seconds
+      setTimeout(() => setError(""), 3000);
+      setOtp(["", "", "", ""]);
     }
   };
 
@@ -54,24 +55,24 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
         className="fixed inset-0 z-50 overflow-y-auto"
         onClose={onClose}
       >
-        <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-50">
-          <Dialog.Panel className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-lg px-4 sm:px-8 py-10 w-full max-w-md mx-auto text-center">
-            <header className="mb-8">
-              <h1 className="text-2xl font-bold mb-1 text-white">
+        <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-60">
+          <Dialog.Panel className="bg-gradient-to-br from-white via-gray-100 to-white rounded-lg shadow-lg px-6 py-8 w-full max-w-sm mx-auto text-center">
+            <header className="mb-6">
+              <h1 className="text-2xl font-bold mb-1 text-gray-900">
                 Enter Room Key
               </h1>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600">
                 Enter the 4-digit key to join the private room.
               </p>
             </header>
             <form id="otp-form" onSubmit={handleSubmit}>
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-3 mb-4">
                 {otp.map((digit, index) => (
                   <input
                     key={index}
                     id={`otp-${index}`}
                     type="text"
-                    className="w-14 h-14 text-center text-2xl font-extrabold text-white bg-[#00112d] border border-gray-600 rounded p-4 outline-none focus:bg-[#000e2d] focus:border-blue-600 focus:ring-2 focus:ring-blue-400"
+                    className="w-12 h-12 text-center text-2xl font-bold text-gray-900 bg-gray-200 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-400"
                     value={digit}
                     onChange={(e) => handleInputChange(e, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
@@ -80,17 +81,15 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
                   />
                 ))}
               </div>
-              <div className="max-w-[260px] mx-auto mt-4">
-                <button
-                  type="submit"
-                  className="w-full inline-flex justify-center whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2.5 text-sm font-medium text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-150"
-                >
-                  Verify Key
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full inline-flex justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-150"
+              >
+                Verify Key
+              </button>
             </form>
-            {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-            <div className="text-sm text-gray-400 mt-4">
+            {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
+            <div className="text-sm text-gray-600 mt-4">
               Didn't receive the key?{" "}
               <a
                 className="font-medium text-blue-500 hover:text-blue-600"

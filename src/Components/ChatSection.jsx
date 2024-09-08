@@ -40,8 +40,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [typing, setTyping] = useState(null);
-  const [typingTimeout, setTypingTimeout] = useState(null);
   const [usernames, setUsernames] = useState({});
   const messagesEndRef = useRef(null);
 
@@ -67,7 +65,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     getUserData();
   }, []);
 
-  // Fetch messages and typing status from Firestore
+  // Fetch messages from Firestore
   useEffect(() => {
     const roomRef = doc(db, "rooms", roomId);
 
@@ -75,7 +73,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
       const roomData = snapshot.data();
       if (roomData) {
         setMessages(roomData.messages || []);
-        setTyping(roomData.typing || null);
       }
     });
 
@@ -87,35 +84,31 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Debounce typing status updates
-  const handleTyping = useCallback(async () => {
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
+  // Handle marking messages as seen
+  const handleMarkAsSeen = useCallback(async () => {
+    if (auth.currentUser) {
+      try {
+        const roomRef = doc(db, "rooms", roomId);
+        await updateDoc(roomRef, {
+          messages: messages.map((message) =>
+            message.senderUid !== auth.currentUser.uid &&
+            !message.seenBy.includes(auth.currentUser.uid)
+              ? {
+                  ...message,
+                  seenBy: [...message.seenBy, auth.currentUser.uid],
+                }
+              : message
+          ),
+        });
+      } catch (error) {
+        console.error("Failed to mark messages as seen", error);
+      }
     }
+  }, [messages, roomId]);
 
-    try {
-      const roomRef = doc(db, "rooms", roomId);
-      await setDoc(
-        roomRef,
-        {
-          typing: {
-            uid: auth.currentUser.uid,
-            name: auth.currentUser.displayName || "Anonymous",
-            timestamp: serverTimestamp(),
-          },
-        },
-        { merge: true }
-      );
-
-      const timeout = setTimeout(async () => {
-        await setDoc(roomRef, { typing: null }, { merge: true });
-      }, 1000);
-
-      setTypingTimeout(timeout);
-    } catch (error) {
-      console.error("Failed to update typing status", error);
-    }
-  }, [roomId, typingTimeout]);
+  useEffect(() => {
+    handleMarkAsSeen();
+  }, [messages, handleMarkAsSeen]);
 
   // Handle sending messages
   const handleSendMessage = async () => {
@@ -126,12 +119,12 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           content: newMessage,
           timestamp: new Date().toISOString(),
           name: auth.currentUser.displayName || "Anonymous",
+          seenBy: [], // Initialize as empty array
         };
 
         const roomRef = doc(db, "rooms", roomId);
         await updateDoc(roomRef, { messages: arrayUnion(message) });
         setNewMessage(""); // Clear input after sending
-        await setDoc(roomRef, { typing: null }, { merge: true }); // Clear typing status
       } catch (error) {
         console.error("Failed to send message", error);
       }
@@ -143,13 +136,13 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const groupedMessages = groupMessages(messages);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#000e2d] text-gray-100 p-4 sm:p-6 shadow-2xl border-l border-[#000e2d]">
+    <div className="flex flex-col h-screen w-full bg-[#ffffff] text-gray-900 p-4 sm:p-6 shadow-lg border-l border-[#e5e5e5]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-[#111f36]">
+      <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-[#e5e5e5]">
         <div className="flex items-center space-x-4">
           {/* Back Arrow Button (Visible on Mobile Only) */}
           <button
-            className="md:hidden text-gray-400 hover:text-gray-300 focus:outline-none"
+            className="md:hidden text-gray-600 hover:text-gray-800 focus:outline-none"
             onClick={onBack}
             aria-label="Back to Rooms"
           >
@@ -159,13 +152,13 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           <img
             src="https://via.placeholder.com/40" // Replace with actual room image
             alt="Room Avatar"
-            className="w-10 h-10 rounded-full border border-[#00112d]"
+            className="w-10 h-10 rounded-full border border-[#e5e5e5]"
           />
-          <div className="text-xl font-semibold text-gray-200">{roomName}</div>
+          <div className="text-xl font-semibold text-gray-900">{roomName}</div>
         </div>
         <div className="relative">
           <button
-            className="text-gray-400 hover:text-gray-300 focus:outline-none"
+            className="text-gray-600 hover:text-gray-800 focus:outline-none"
             onClick={toggleDropdown}
             aria-label="More Options"
           >
@@ -173,9 +166,9 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           </button>
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-32 bg-[#002244] rounded-lg shadow-lg overflow-hidden z-10">
+            <div className="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-10">
               <button
-                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-[#00112d]"
+                className="block w-full text-left px-4 py-2 text-gray-900 hover:bg-gray-100"
                 onClick={onExit}
                 aria-label="Exit Room"
               >
@@ -210,47 +203,46 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                     key={idx}
                     className={`${
                       message.senderUid === auth.currentUser.uid
-                        ? "bg-gradient-to-r from-[#003366] to-[#004080] text-white"
-                        : "bg-[#002244] text-gray-300"
-                    } max-w-xs p-3 rounded-lg shadow-md mb-1`}
+                        ? "bg-[#f1f1f1] text-gray-900"
+                        : "bg-[#e5e5e5] text-gray-900"
+                    } max-w-xs p-3 rounded-lg shadow-md mb-1 relative`}
                   >
                     {/* Display sender's name */}
                     <div className="font-medium">
                       {usernames[message.senderUid] || "Unknown"}
                     </div>
                     <div className="text-sm">{message.content}</div>
-                    <div className="text-xs text-gray-400 mt-1">
+                    <div className="text-xs text-gray-600 mt-1">
                       {formatTime(message.timestamp)}
                     </div>
+                    {/* Seen indicator */}
+                    <div
+                      className={`absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full ${
+                        message.seenBy.includes(auth.currentUser.uid)
+                          ? "bg-green-500"
+                          : "bg-blue-500"
+                      }`}
+                    />
                   </div>
                 ))}
               </div>
             </div>
           ))}
-          {/* Typing Indicator */}
-          {typing && (
-            <div className="flex justify-start items-center mb-4 text-gray-300">
-              <div className="animate-pulse">Typing...</div>
-            </div>
-          )}
           <div ref={messagesEndRef} /> {/* Scroll reference */}
         </div>
       </div>
 
       {/* Input Field */}
-      <div className="flex items-center border-t border-[#00112d] pt-4">
+      <div className="flex items-center border-t border-[#e5e5e5] pt-4">
         <input
           type="text"
-          placeholder="Type your message..."
-          className="flex-1 px-4 py-2 border border-[#16253d] bg-[#00112d] rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-[#003366] text-gray-200 placeholder-gray-500"
+          placeholder="Type a message..."
+          className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#007bff]"
           value={newMessage}
-          onChange={(e) => {
-            setNewMessage(e.target.value);
-            handleTyping(); // Update typing status on input change
-          }}
+          onChange={(e) => setNewMessage(e.target.value)}
         />
         <button
-          className="ml-4 bg-gradient-to-r from-[#003366] to-[#004080] text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#003366]"
+          className="ml-2 bg-[#007bff] text-white px-4 py-2 rounded-lg hover:bg-[#0056b3] focus:outline-none focus:ring-2 focus:ring-[#007bff]"
           onClick={handleSendMessage}
         >
           <FiSend className="w-5 h-5" />
