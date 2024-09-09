@@ -84,32 +84,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle marking messages as seen
-  const handleMarkAsSeen = useCallback(async () => {
-    if (auth.currentUser) {
-      try {
-        const roomRef = doc(db, "rooms", roomId);
-        await updateDoc(roomRef, {
-          messages: messages.map((message) =>
-            message.senderUid !== auth.currentUser.uid &&
-            !message.seenBy.includes(auth.currentUser.uid)
-              ? {
-                  ...message,
-                  seenBy: [...message.seenBy, auth.currentUser.uid],
-                }
-              : message
-          ),
-        });
-      } catch (error) {
-        console.error("Failed to mark messages as seen", error);
-      }
-    }
-  }, [messages, roomId]);
-
-  useEffect(() => {
-    handleMarkAsSeen();
-  }, [messages, handleMarkAsSeen]);
-
   // Handle sending messages
   const handleSendMessage = async () => {
     if (newMessage.trim() !== "") {
@@ -119,12 +93,12 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           content: newMessage,
           timestamp: new Date().toISOString(),
           name: auth.currentUser.displayName || "Anonymous",
-          seenBy: [], // Initialize as empty array
         };
 
         const roomRef = doc(db, "rooms", roomId);
         await updateDoc(roomRef, { messages: arrayUnion(message) });
         setNewMessage(""); // Clear input after sending
+        await setDoc(roomRef, { typing: null }, { merge: true }); // Ensure typing status is cleared
       } catch (error) {
         console.error("Failed to send message", error);
       }
@@ -205,7 +179,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                       message.senderUid === auth.currentUser.uid
                         ? "bg-[#f1f1f1] text-gray-900"
                         : "bg-[#e5e5e5] text-gray-900"
-                    } max-w-xs p-3 rounded-lg shadow-md mb-1 relative`}
+                    } max-w-xs p-3 rounded-lg shadow-md mb-1`}
                   >
                     {/* Display sender's name */}
                     <div className="font-medium">
@@ -215,14 +189,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                     <div className="text-xs text-gray-600 mt-1">
                       {formatTime(message.timestamp)}
                     </div>
-                    {/* Seen indicator */}
-                    <div
-                      className={`absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full ${
-                        message.seenBy.includes(auth.currentUser.uid)
-                          ? "bg-green-500"
-                          : "bg-blue-500"
-                      }`}
-                    />
                   </div>
                 ))}
               </div>

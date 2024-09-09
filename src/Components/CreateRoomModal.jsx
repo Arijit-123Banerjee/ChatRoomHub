@@ -10,6 +10,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
   const [roomName, setRoomName] = useState("");
   const [status, setStatus] = useState("Public");
   const [roomKey, setRoomKey] = useState("");
+  const [isCreating, setIsCreating] = useState(false); // New state for loading
 
   // Generate a random 4-digit room key for private rooms
   const generateRoomKey = () => {
@@ -30,6 +31,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
   // Handle room creation logic
   const handleCreate = async () => {
     if (roomName && auth.currentUser) {
+      setIsCreating(true); // Set loading state to true
       try {
         const userId = auth.currentUser.uid;
 
@@ -73,6 +75,9 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
         setRoomKey("");
       } catch (error) {
         console.error("Failed to create room", error);
+      } finally {
+        setIsCreating(false); // Reset loading state
+        onClose(); // Close the modal
       }
     }
   };
@@ -85,14 +90,14 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
         onClose={onClose}
       >
         <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-50">
-          <Dialog.Panel className="bg-[#000e2d] rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
-            <Dialog.Title className="text-lg font-semibold text-white mb-4">
+          <Dialog.Panel className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
+            <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">
               Create Room
             </Dialog.Title>
             <div className="space-y-4">
               {/* Room Name Input */}
               <div>
-                <label htmlFor="room-name" className="block text-gray-300">
+                <label htmlFor="room-name" className="block text-gray-600">
                   Room Name
                 </label>
                 <input
@@ -100,21 +105,23 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   type="text"
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
+                  disabled={isCreating} // Disable input when creating
                 />
               </div>
               {/* Status Selection */}
               <div>
-                <label className="block text-gray-300 mb-2">Status</label>
+                <label className="block text-gray-600 mb-2">Status</label>
                 <div className="flex space-x-4">
                   <button
                     type="button"
                     onClick={() => handleStatusChange("Public")}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Public"
-                        ? "bg-blue-600 text-white border-teal-600"
-                        : "bg-gray-700 text-gray-300 border-gray-600"
-                    } hover:bg-blue-700 hover:border-teal-700`}
+                        ? "bg-gradient-to-r from-cyan-700 to-blue-800 text-white"
+                        : "bg-white text-gray-900 border-gray-300"
+                    }`}
+                    disabled={isCreating} // Disable button when creating
                   >
                     <TfiWorld className="mr-2" />
                     Public
@@ -124,9 +131,10 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                     onClick={() => handleStatusChange("Private")}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
                       status === "Private"
-                        ? "bg-red-600 text-white border-red-600"
-                        : "bg-gray-700 text-gray-300 border-gray-600"
-                    } hover:bg-red-700 hover:border-red-700`}
+                        ? "bg-gradient-to-r from-cyan-700 to-blue-800 text-white"
+                        : "bg-white text-gray-800 border-gray-300"
+                    }`}
+                    disabled={isCreating} // Disable button when creating
                   >
                     <CiLock className="mr-2" />
                     Private
@@ -135,10 +143,10 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
               </div>
               {/* Display Room Key for Private Rooms */}
               {status === "Private" && roomKey && (
-                <div className="bg-gray-800 text-center p-4 rounded-md">
-                  <p className="text-gray-300 mb-2">Room Key:</p>
-                  <p className="text-white font-mono text-lg">{roomKey}</p>
-                  <p className="text-gray-400 text-sm">
+                <div className="bg-slate-100 text-center p-4 rounded-md">
+                  <p className="text-gray-600 mb-2">Room Key:</p>
+                  <p className="text-gray-900 font-bold text-lg">{roomKey}</p>
+                  <p className="text-gray-500 text-sm">
                     Share this key with others to join the room.
                   </p>
                 </div>
@@ -148,16 +156,19 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-600 text-gray-300 rounded-lg hover:bg-gray-500 hover:text-white"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  disabled={isCreating} // Disable button when creating
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleCreate}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-gradient-to-r from-cyan-700 to-blue-800 text-white rounded-lg"
+                  disabled={isCreating} // Disable button when creating
                 >
-                  Create
+                  {isCreating ? "Creating..." : "Create"}{" "}
+                  {/* Button text changes */}
                 </button>
               </div>
             </div>

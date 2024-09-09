@@ -31,7 +31,7 @@ const App = () => {
   const handleBackToSidebar = () => setSidebarOpen(true);
 
   return (
-    <div className="flex h-screen bg-[#000e2d]">
+    <div className="flex h-screen bg-hero-illustration">
       {sidebarOpen && (
         <Sidebar
           onRoomSelect={handleRoomSelect}
@@ -51,7 +51,7 @@ const App = () => {
             roomId={selectedRoom.id}
           />
         ) : (
-          <div className="flex-1 h-screen flex items-center justify-center text-gray-300 bg-[#000e2d]">
+          <div className="flex-1 h-screen flex items-center justify-center text-xl text-gray-900 font-bold bg-white ">
             No room selected
           </div>
         )}
