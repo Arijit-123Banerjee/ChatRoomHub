@@ -42,7 +42,7 @@ const SignInPage = () => {
   return isLoading ? (
     <LoadingSpinner />
   ) : (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-white via-gray-100 to-gray-200 text-gray-900 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-hero-illustration text-gray-900 p-4">
       <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-300 sm:p-6 md:p-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-4 sm:mb-6">
           Sign Up

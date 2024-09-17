@@ -13,10 +13,8 @@
 }
 
 .bg-hero-illustration {
-  background: radial-gradient(circle at center, #ecebf5, #ecebf5 10%, transparent 10%, transparent 20%, #ecebf5 20%, #ecebf5 30%, transparent 30%, transparent 40%, #ecebf5 40%, #ecebf5 50%, transparent 50%, transparent 60%, #ecebf5 60%, #ecebf5 70%, transparent 70%, transparent 80%, #ecebf5 80%, #ecebf5 90%, transparent 90%);
-  background-size: 2em 2em;
-  background-color: #ffffff;
-  opacity: 1
+  background-image: url("./assets/background.jpeg");
+  background-size: cover;
 }
 
 .bg-blur {

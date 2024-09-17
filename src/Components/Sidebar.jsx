@@ -89,7 +89,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-white text-gray-900 p-4 sm:p-6  border-gray-300   transform transition-transform ${
+      className={`fixed inset-0 z-50 bg-hero-illustration text-gray-900 p-4 sm:p-6  border-gray-300   transform transition-transform ${
         setSidebarOpen ? "translate-x-0" : "-translate-x-full"
       } md:relative md:translate-x-0 md:w-[25%] md:h-screen md:border-r md:border-gray-300 flex flex-col`}
     >
