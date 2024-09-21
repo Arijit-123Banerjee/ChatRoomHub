@@ -79,14 +79,14 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
         className="fixed inset-0 z-50 overflow-y-auto"
         onClose={onClose}
       >
-        <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-50">
-          <Dialog.Panel className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
-            <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">
+        <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-60">
+          <Dialog.Panel className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-lg p-6 w-full max-w-md mx-auto border border-white border-opacity-20">
+            <Dialog.Title className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500 mb-6">
               Create Room
             </Dialog.Title>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label htmlFor="room-name" className="block text-gray-600">
+                <label htmlFor="room-name" className="block text-gray-300 mb-2">
                   Room Name
                 </label>
                 <input
@@ -94,20 +94,21 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   type="text"
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
+                  className="w-full px-4 py-2 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-400"
                   disabled={isCreating}
+                  placeholder="Enter room name"
                 />
               </div>
               <div>
-                <label className="block text-gray-600 mb-2">Status</label>
+                <label className="block text-gray-300 mb-2">Status</label>
                 <div className="flex space-x-4">
                   <button
                     type="button"
                     onClick={() => handleStatusChange("Public")}
-                    className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
+                    className={`flex items-center justify-center px-4 py-2 rounded-full transition-all duration-300 ${
                       status === "Public"
-                        ? "bg-gradient-to-r from-cyan-700 to-blue-800 text-white"
-                        : "bg-white text-gray-900 border-gray-300"
+                        ? "bg-gradient-to-r from-pink-500 to-yellow-500 text-white"
+                        : "bg-white bg-opacity-10 text-white border border-white border-opacity-20"
                     }`}
                     disabled={isCreating}
                   >
@@ -117,10 +118,10 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                   <button
                     type="button"
                     onClick={() => handleStatusChange("Private")}
-                    className={`flex items-center justify-center px-4 py-2 rounded-lg border transition-colors ${
+                    className={`flex items-center justify-center px-4 py-2 rounded-full transition-all duration-300 ${
                       status === "Private"
-                        ? "bg-gradient-to-r from-cyan-700 to-blue-800 text-white"
-                        : "bg-white text-gray-800 border-gray-300"
+                        ? "bg-gradient-to-r from-pink-500 to-yellow-500 text-white"
+                        : "bg-white bg-opacity-10 text-white border border-white border-opacity-20"
                     }`}
                     disabled={isCreating}
                   >
@@ -130,10 +131,10 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                 </div>
               </div>
               {status === "Private" && roomKey && (
-                <div className="bg-slate-100 text-center p-4 rounded-md">
-                  <p className="text-gray-600 mb-2">Room Key:</p>
-                  <p className="text-gray-900 font-bold text-lg">{roomKey}</p>
-                  <p className="text-gray-500 text-sm">
+                <div className="bg-white bg-opacity-10 text-center p-4 rounded-lg">
+                  <p className="text-gray-300 mb-2">Room Key:</p>
+                  <p className="text-white font-bold text-lg">{roomKey}</p>
+                  <p className="text-gray-400 text-sm mt-2">
                     Share this key with others to join the room.
                   </p>
                 </div>
@@ -142,7 +143,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  className="px-4 py-2 bg-white bg-opacity-10 text-white rounded-full hover:bg-opacity-20 transition-all duration-300"
                   disabled={isCreating}
                 >
                   Cancel
@@ -150,7 +151,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
                 <button
                   type="button"
                   onClick={handleCreate}
-                  className="px-4 py-2 bg-gradient-to-r from-cyan-700 to-blue-800 text-white rounded-lg"
+                  className="px-6 py-2 bg-gradient-to-r from-pink-500 to-yellow-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-yellow-600 transition-all duration-300 transform hover:-translate-y-1"
                   disabled={isCreating}
                 >
                   {isCreating ? "Creating..." : "Create"}

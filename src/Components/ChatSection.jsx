@@ -110,13 +110,13 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const groupedMessages = groupMessages(messages);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#ffffff] text-gray-900 p-4 sm:p-6 shadow-lg border-l border-[#e5e5e5]">
+    <div className="flex flex-col h-screen w-full bg-gradient-to-br from-indigo-900 to-purple-800 text-white p-4 sm:p-6 shadow-lg border-l border-white border-opacity-20">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-[#e5e5e5]">
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-white border-opacity-20">
         <div className="flex items-center space-x-4">
           {/* Back Arrow Button (Visible on Mobile Only) */}
           <button
-            className="md:hidden text-gray-600 hover:text-gray-800 focus:outline-none"
+            className="md:hidden text-white hover:text-pink-400 focus:outline-none transition-colors duration-300"
             onClick={onBack}
             aria-label="Back to Rooms"
           >
@@ -126,13 +126,15 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           <img
             src="https://via.placeholder.com/40" // Replace with actual room image
             alt="Room Avatar"
-            className="w-10 h-10 rounded-full border border-[#e5e5e5]"
+            className="w-10 h-10 rounded-full border border-white border-opacity-20"
           />
-          <div className="text-xl font-semibold text-gray-900">{roomName}</div>
+          <div className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500">
+            {roomName}
+          </div>
         </div>
         <div className="relative">
           <button
-            className="text-gray-600 hover:text-gray-800 focus:outline-none"
+            className="text-white hover:text-pink-400 focus:outline-none transition-colors duration-300"
             onClick={toggleDropdown}
             aria-label="More Options"
           >
@@ -140,9 +142,9 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           </button>
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-10">
+            <div className="absolute right-0 mt-2 w-32 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg overflow-hidden z-10 border border-white border-opacity-20">
               <button
-                className="block w-full text-left px-4 py-2 text-gray-900 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-white hover:bg-white hover:bg-opacity-20 transition-colors duration-300"
                 onClick={onExit}
                 aria-label="Exit Room"
               >
@@ -177,8 +179,8 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                     key={idx}
                     className={`${
                       message.senderUid === auth.currentUser.uid
-                        ? "bg-[#f1f1f1] text-gray-900"
-                        : "bg-[#e5e5e5] text-gray-900"
+                        ? "bg-gradient-to-r from-pink-500 to-yellow-500"
+                        : "bg-white bg-opacity-10"
                     } max-w-xs p-3 rounded-lg shadow-md mb-1`}
                   >
                     {/* Display sender's name */}
@@ -186,7 +188,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                       {usernames[message.senderUid] || "Unknown"}
                     </div>
                     <div className="text-sm">{message.content}</div>
-                    <div className="text-xs text-gray-600 mt-1">
+                    <div className="text-xs text-white text-opacity-60 mt-1">
                       {formatTime(message.timestamp)}
                     </div>
                   </div>
@@ -199,16 +201,16 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
       </div>
 
       {/* Input Field */}
-      <div className="flex items-center border-t border-[#e5e5e5] pt-4">
+      <div className="flex items-center border-t border-white border-opacity-20 pt-4">
         <input
           type="text"
           placeholder="Type a message..."
-          className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#007bff]"
+          className="flex-1 px-4 py-2 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
         <button
-          className="ml-2 bg-[#007bff] text-white px-4 py-2 rounded-lg hover:bg-[#0056b3] focus:outline-none focus:ring-2 focus:ring-[#007bff]"
+          className="ml-2 bg-gradient-to-r from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg hover:from-pink-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300 transform hover:-translate-y-1"
           onClick={handleSendMessage}
         >
           <FiSend className="w-5 h-5" />

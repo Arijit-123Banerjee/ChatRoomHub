@@ -1,4 +1,3 @@
-// src/utils/addUserToRoom.js
 import {
   doc,
   updateDoc,

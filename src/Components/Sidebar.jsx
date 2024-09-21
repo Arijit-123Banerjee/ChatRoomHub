@@ -89,31 +89,33 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-hero-illustration text-gray-900 p-4 sm:p-6  border-gray-300   transform transition-transform ${
+      className={`fixed inset-0 z-50 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg text-white p-4 sm:p-6 border-r border-white border-opacity-20 transform transition-transform ${
         setSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } md:relative md:translate-x-0 md:w-[25%] md:h-screen md:border-r md:border-gray-300 flex flex-col`}
+      } md:relative md:translate-x-0 md:w-[25%] md:h-screen flex flex-col`}
     >
-      <div className="text-3xl font-semibold mb-6 text-gray-900 tracking-wide">
-        Rooms
+      <div className="text-3xl font-extrabold mb-6 tracking-wide">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500">
+          Rooms
+        </span>
       </div>
 
       <input
         type="text"
         placeholder="Search rooms..."
-        className="w-full px-4 py-2 border border-gray-300 bg-gray-100 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-900 placeholder-gray-500 mb-6"
+        className="w-full px-4 py-2 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-400 mb-6"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
       <button
-        className=" w-36 bg-gradient-to-r flex justify-around items-center  from-cyan-700 to-blue-800 text-white px-4 py-2 rounded-lg mb-6 shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        className="w-36 bg-gradient-to-r flex justify-around items-center from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-full mb-6 shadow-lg transition-all duration-300 hover:from-pink-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transform hover:-translate-y-1"
         onClick={() => setModalOpen(true)}
       >
         <FaPlus />
         Create Room
       </button>
 
-      <p className="text-gray-600 mb-4 font-medium tracking-wide">
+      <p className="text-gray-300 mb-4 font-medium tracking-wide">
         Available Rooms
       </p>
       <div className="flex-1 overflow-y-auto">
@@ -122,16 +124,16 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
             filteredRooms.map((room) => (
               <div
                 key={room.id}
-                className="bg-gray-100 p-4 rounded-lg shadow-md border border-gray-300 hover:bg-gray-200 transition duration-300 cursor-pointer"
+                className="bg-white bg-opacity-10 p-4 rounded-lg shadow-md border border-white border-opacity-20 hover:bg-opacity-20 transition duration-300 cursor-pointer"
                 onClick={() => handleRoomSelect(room)}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <div className="text-lg font-semibold text-gray-900">
+                  <div className="text-lg font-semibold text-white">
                     {room.name}
                   </div>
                   <div
                     className={`text-xs px-3 py-1 rounded-full flex items-center ${
-                      room.status === "Public" ? "bg-cyan-600" : "bg-red-600"
+                      room.status === "Public" ? "bg-green-500" : "bg-red-500"
                     } text-white`}
                   >
                     {room.status === "Public" ? (
@@ -142,13 +144,13 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
                     {room.status}
                   </div>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-300">
                   Members: {room.memberCount || 0}
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-gray-500">No rooms found</p>
+            <p className="text-gray-400">No rooms found</p>
           )}
         </div>
       </div>
@@ -178,7 +180,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
       )}
 
       <button
-        className="absolute bottom-4 left-4 p-2 rounded-full bg-gray-100 text-gray-900 shadow-lg transition-transform transform hover:scale-105 hover:text-red-600 hover:bg-gray-200 focus:outline-none"
+        className="absolute bottom-4 left-4 p-2 rounded-full bg-white bg-opacity-10 text-white shadow-lg transition-all duration-300 hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-pink-500 transform hover:-translate-y-1"
         onClick={handleLogout}
       >
         <FiLogOut className="text-xl" />

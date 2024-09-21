@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import LoadingSpinner from "../Components/LoadingSpinner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from "../firebase";
@@ -42,16 +42,25 @@ const SignInPage = () => {
   return isLoading ? (
     <LoadingSpinner />
   ) : (
-    <div className="flex items-center justify-center min-h-screen bg-hero-illustration text-gray-900 p-4">
-      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-300 sm:p-6 md:p-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-4 sm:mb-6">
-          Sign Up
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 to-purple-800 text-white p-4 relative overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-20 left-20 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 right-20 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="w-full max-w-md p-8 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-lg border border-white border-opacity-20 sm:p-6 md:p-8 z-10">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-6 sm:mb-8">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500">
+            Sign Up
+          </span>
         </h2>
         <form className="space-y-4 sm:space-y-6" onSubmit={handleSignIn}>
           <div>
             <label
               htmlFor="username"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-300"
             >
               Username
             </label>
@@ -60,7 +69,7 @@ const SignInPage = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-900 placeholder-gray-500"
+              className="w-full px-4 py-2 mt-1 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-400"
               placeholder="Enter your username"
               required
             />
@@ -68,7 +77,7 @@ const SignInPage = () => {
           <div>
             <label
               htmlFor="email"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-300"
             >
               Email
             </label>
@@ -77,7 +86,7 @@ const SignInPage = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-900 placeholder-gray-500"
+              className="w-full px-4 py-2 mt-1 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-400"
               placeholder="Enter your email"
               required
             />
@@ -85,7 +94,7 @@ const SignInPage = () => {
           <div>
             <label
               htmlFor="password"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-300"
             >
               Password
             </label>
@@ -94,24 +103,27 @@ const SignInPage = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-900 placeholder-gray-500"
+              className="w-full px-4 py-2 mt-1 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-400"
               placeholder="Enter your password"
               required
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full py-2 mt-4 bg-gradient-to-r from-cyan-700 to-blue-800 text-white rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full py-3 mt-6 bg-gradient-to-r from-pink-500 to-yellow-500 text-white rounded-full shadow-lg transition-all duration-300 hover:from-pink-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transform hover:-translate-y-1"
           >
             Sign Up
           </button>
         </form>
-        <p className="text-sm text-center text-gray-400 mt-4">
+        <p className="text-sm text-center text-gray-300 mt-6">
           Already have an account?{" "}
-          <a href="/login" className="text-cyan-500 hover:underline">
+          <Link
+            to="/login"
+            className="text-pink-400 hover:text-pink-300 hover:underline"
+          >
             Log In
-          </a>
+          </Link>
         </p>
       </div>
     </div>
