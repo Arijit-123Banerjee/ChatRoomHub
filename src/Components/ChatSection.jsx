@@ -122,12 +122,9 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           >
             <IoArrowBack className="w-6 h-6" />
           </button>
-          {/* Room Avatar and Name */}
-          <img
-            src="https://via.placeholder.com/40" // Replace with actual room image
-            alt="Room Avatar"
-            className="w-10 h-10 rounded-full border border-white border-opacity-20"
-          />
+          <div className="w-10 h-10 rounded-full border border-white border-opacity-20 bg-gradient-to-br from-pink-500 to-yellow-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+            {roomName.charAt(0).toUpperCase()}
+          </div>
           <div className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500">
             {roomName}
           </div>
