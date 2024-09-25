@@ -21,7 +21,7 @@ Chat Room Hub is a real-time chat application where users can create and join pu
 
 You can try the application live here:
 
-🔗 [Chat Room Hub on Vercel](my-project-nu-murex.vercel.app)
+🔗 [Chat Room Hub on Vercel](https://my-project-nu-murex.vercel.app/)
 
 ## How to Use
 
