@@ -44,7 +44,6 @@ const Login = () => {
     <LoadingSpinner />
   ) : (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 to-purple-800 text-white p-4 relative overflow-hidden">
-      {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-20 left-20 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
         <div className="absolute top-40 right-20 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>

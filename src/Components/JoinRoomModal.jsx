@@ -57,7 +57,6 @@ const JoinRoomModal = ({ isOpen, onClose, onJoin, expectedKey }) => {
       >
         <div className="flex items-center justify-center min-h-screen px-4 py-6 bg-black bg-opacity-60">
           <Dialog.Panel className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-lg px-8 py-10 w-full max-w-sm mx-auto text-center border border-white border-opacity-20 relative overflow-hidden">
-            {/* Background blobs */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
 

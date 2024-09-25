@@ -52,16 +52,16 @@ const LandingPage = () => {
           ref={refs.heading}
           className="text-5xl sm:text-6xl font-extrabold mb-6 tracking-tight leading-none"
         >
-          Redefine Your{" "}
+          Welcome to{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500">
-            Collaboration
+            Chat Room Hub
           </span>
         </h1>
         <p
           ref={refs.subHeading}
           className="text-2xl sm:text-3xl font-medium mb-12 text-gray-300"
         >
-          Innovate & Create with our cutting-edge platform
+          Connect, Create, and Chat with ease in your favorite rooms
         </p>
         <div
           ref={refs.buttons}
@@ -71,7 +71,7 @@ const LandingPage = () => {
             to="/app"
             className="px-8 py-4 text-lg font-semibold rounded-full bg-gradient-to-r from-pink-500 to-yellow-500 text-white hover:from-pink-600 hover:to-yellow-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
-            Go to Dashboard
+            Go to Chat Rooms
           </Link>
           <Link
             to="/signin"
@@ -84,7 +84,7 @@ const LandingPage = () => {
           ref={refs.getStarted}
           className="text-gray-300 text-lg mb-8 font-medium"
         >
-          Join thousands of teams already using our platform
+          Join a community of chat enthusiasts creating and connecting daily
         </p>
       </div>
     </section>

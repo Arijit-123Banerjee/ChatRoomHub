@@ -21,7 +21,6 @@ const formatTime = (timestamp) => {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
-// Utility function to group messages
 const groupMessages = (messages) => {
   return messages.reduce((acc, message) => {
     if (
@@ -43,7 +42,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
   const [usernames, setUsernames] = useState({});
   const messagesEndRef = useRef(null);
 
-  // Function to fetch user data
   const getUserData = async () => {
     try {
       const db = getFirestore(app);
@@ -51,7 +49,7 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
       const docsnap = await getDocs(docref);
       const data = docsnap.docs.reduce((acc, doc) => {
         const userData = doc.data();
-        acc[doc.id] = userData.username; // Assuming `username` is a field in your `users` collection
+        acc[doc.id] = userData.username;
         return acc;
       }, {});
       setUsernames(data);
@@ -60,12 +58,10 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
     }
   };
 
-  // Call getUserData on component mount
   useEffect(() => {
     getUserData();
   }, []);
 
-  // Fetch messages from Firestore
   useEffect(() => {
     const roomRef = doc(db, "rooms", roomId);
 
@@ -76,10 +72,9 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
       }
     });
 
-    return () => unsubscribe(); // Clean up subscription on component unmount
+    return () => unsubscribe();
   }, [roomId]);
 
-  // Scroll to the bottom of the messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -97,8 +92,8 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
 
         const roomRef = doc(db, "rooms", roomId);
         await updateDoc(roomRef, { messages: arrayUnion(message) });
-        setNewMessage(""); // Clear input after sending
-        await setDoc(roomRef, { typing: null }, { merge: true }); // Ensure typing status is cleared
+        setNewMessage("");
+        await setDoc(roomRef, { typing: null }, { merge: true });
       } catch (error) {
         console.error("Failed to send message", error);
       }
@@ -111,10 +106,8 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-gradient-to-br from-indigo-900 to-purple-800 text-white p-4 sm:p-6 shadow-lg border-l border-white border-opacity-20">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4 pb-4 border-b border-white border-opacity-20">
         <div className="flex items-center space-x-4">
-          {/* Back Arrow Button (Visible on Mobile Only) */}
           <button
             className="md:hidden text-white hover:text-pink-400 focus:outline-none transition-colors duration-300"
             onClick={onBack}
@@ -137,7 +130,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
           >
             <BsThreeDotsVertical className="w-6 h-6" />
           </button>
-          {/* Dropdown Menu */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-32 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg overflow-hidden z-10 border border-white border-opacity-20">
               <button
@@ -152,7 +144,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
         </div>
       </div>
 
-      {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto mb-4 chat">
         <div className="space-y-4">
           {groupedMessages.map((messageGroup, index) => (
@@ -180,7 +171,6 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
                         : "bg-white bg-opacity-10"
                     } max-w-xs p-3 rounded-lg shadow-md mb-1`}
                   >
-                    {/* Display sender's name */}
                     <div className="font-medium">
                       {usernames[message.senderUid] || "Unknown"}
                     </div>
@@ -193,11 +183,10 @@ const ChatSection = ({ roomName, onExit, onBack, roomId }) => {
               </div>
             </div>
           ))}
-          <div ref={messagesEndRef} /> {/* Scroll reference */}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Input Field */}
       <div className="flex items-center border-t border-white border-opacity-20 pt-4">
         <input
           type="text"

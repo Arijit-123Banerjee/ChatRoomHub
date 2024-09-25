@@ -61,7 +61,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
 
   const handleConfirmJoinRoom = async () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
-    await AddUserToRoom(selectedRoom.id, auth.currentUser); // Add user to room
+    await AddUserToRoom(selectedRoom.id, auth.currentUser);
     onRoomSelect(selectedRoom);
     setConfirmationModalOpen(false);
   };
@@ -73,7 +73,7 @@ const Sidebar = ({ onRoomSelect, setSidebarOpen }) => {
   const handleJoin = async () => {
     if (window.innerWidth <= 768) setSidebarOpen(false);
 
-    await AddUserToRoom(selectedRoom.id, auth.currentUser); // Add user to room
+    await AddUserToRoom(selectedRoom.id, auth.currentUser);
     onRoomSelect(selectedRoom);
     setJoinModalOpen(false);
   };
